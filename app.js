@@ -6,11 +6,56 @@ function clock(){const d=new Date();$("clock").textContent=d.toLocaleTimeString(
 function mins(v){if(v==null||v===""||v==="-")return null;if(typeof v==='number')return v;const s=String(v).trim();if(/^\d+$/.test(s))return Number(s);const m=s.match(/(\d+)\s*(?:min|mins|minutes|分鐘)/i);if(m)return +m[1];return null}
 function eta(n){if(n==null)return ["--",""];if(n<=1)return ["即將",""];return [String(n),"分鐘"]}
 async function get(path,params={}){const u=new URL(PROXY+path);Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw Error(path+' HTTP '+r.status);return r}
-async function mtr(sta){return (await get('/tml',{sta})).json()}
-async function lrt(id){return (await get('/lrt',{station_id:String(id),with_special:'1'})).json()}
+async function mtr(sta){
+  const target=`https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=TML&sta=${encodeURIComponent(sta)}&lang=TC`;
+  try{
+    return await (await get('/mtr',{url:target})).json();
+  }catch(e){
+    // Backward-compatible fallback for an older deployed proxy.
+    return await (await get('/tml',{sta})).json();
+  }
+}
+async function lrt(id){
+  const target=`https://rt.data.gov.hk/v1/transport/mtr/lrt/getSchedule?station_id=${encodeURIComponent(id)}&with_special=1`;
+  try{
+    return await (await get('/mtr',{url:target})).json();
+  }catch(e){
+    // Backward-compatible fallback for an older deployed proxy.
+    return await (await get('/lrt',{station_id:String(id),with_special:'1'})).json();
+  }
+}
 function renderTML(sta,j){const root=$(sta+'-eta');const d=j?.data?.['TML-'+sta]||{};let rows=[];['UP','DOWN'].forEach(dir=>{(Array.isArray(d[dir])?d[dir]:[]).forEach(x=>{const n=mins(x.ttnt)??mins(x.time)??mins(x.arrival_time);if(n==null)return;const dest=x.dest_ch||x.dest||x.dest_en||'';const label=/WKS|Wu Kai Sha|烏溪沙/i.test(dest)?'往烏溪沙':/TUM|Tuen Mun|屯門/i.test(dest)?'往屯門':('往'+dest);rows.push({n,label})})});rows.sort((a,b)=>a.n-b.n);const seen=new Set();rows=rows.filter(x=>{const k=x.label+'|'+x.n;if(seen.has(k))return false;seen.add(k);return true}).slice(0,4);root.innerHTML=rows.length?rows.map(x=>{const[a,b]=eta(x.n);return `<div class="eta-line"><div><b>${esc(x.label)}</b><small>Tuen Ma Line</small></div><strong>${a}<small>${b}</small></strong></div>`}).join(''):'<span class="muted">暫無實時班次</span>'}
 function parseLRT(group,j){const out=[];(j?.platform_list||[]).forEach(p=>(p.route_list||[]).forEach(r=>{const route=String(r.route_no||'').trim();if(!group.routes.includes(route))return;const dest=String(r.dest_ch||r.dest_en||'');const n=mins(r.time_ch)??mins(r.time_en)??mins(r.time);if(n==null)return;out.push({route,dest,n,plat:p.platform_id})}));const seen=new Set();return out.sort((a,b)=>a.n-b.n).filter(x=>{const k=x.route+'|'+x.dest+'|'+x.n;if(seen.has(k))return false;seen.add(k);return true}).slice(0,4)}
-async function loadRail(){let tOK=0,lOK=0,all=[];const tr=await Promise.allSettled(TML.map(async s=>[s,await mtr(s)]));tr.forEach(x=>{if(x.status==='fulfilled'){const[s,j]=x.value;renderTML(s,j);if(j?.status==='1'||j?.data?.['TML-'+s])tOK++}else console.warn(x.reason)});const lr=await Promise.allSettled(LRT.map(async g=>[g,await lrt(g.station)]));lr.forEach(x=>{if(x.status==='fulfilled'){const[g,j]=x.value;const rows=parseLRT(g,j);if(Array.isArray(j?.platform_list))lOK++;rows.forEach(r=>all.push({...r,station:g.name}))}else console.warn(x.reason)});all.sort((a,b)=>a.n-b.n);$('LRT-eta').innerHTML=all.length?all.slice(0,8).map(r=>{const[a,b]=eta(r.n);return `<div class="lrt-row"><span class="route-chip">${esc(r.route)}</span><div><b>${esc(r.station)} → ${esc(r.dest)}</b><small>月台 ${esc(r.plat??'--')}</small></div><strong>${a}<small>${b}</small></strong></div>`}).join(''):'<span class="muted">目前沒有即將到站列車</span>';$('rail-update').textContent=new Date().toLocaleTimeString('zh-HK',{hour12:false});$('tml-status').textContent=tOK?'正常服務':'連線重試';$('lrt-status').textContent=lOK?'正常服務':'連線重試'}
+async function loadRail(){
+  let tOK=0,lOK=0,all=[];
+  const tr=await Promise.allSettled(TML.map(async s=>[s,await mtr(s)]));
+  tr.forEach(x=>{
+    if(x.status==='fulfilled'){
+      const[s,j]=x.value;
+      renderTML(s,j);
+      if(j?.data?.['TML-'+s] || j?.status==='1') tOK++;
+    }else{
+      console.warn('TML API',x.reason);
+      const sta=x.reason;
+    }
+  });
+  const lr=await Promise.allSettled(LRT.map(async g=>[g,await lrt(g.station)]));
+  lr.forEach(x=>{
+    if(x.status==='fulfilled'){
+      const[g,j]=x.value;
+      const rows=parseLRT(g,j);
+      if(Array.isArray(j?.platform_list)) lOK++;
+      rows.forEach(r=>all.push({...r,station:g.name}));
+    }else console.warn('LRT API',x.reason);
+  });
+  all.sort((a,b)=>a.n-b.n);
+  $('LRT-eta').innerHTML=all.length
+    ? all.slice(0,8).map(r=>{const[a,b]=eta(r.n);return `<div class="lrt-row"><span class="route-chip">${esc(r.route)}</span><div><b>${esc(r.station)} → ${esc(r.dest)}</b><small>月台 ${esc(r.plat??'--')}</small></div><strong>${a}<small>${b}</small></strong></div>`}).join('')
+    : `<span class="muted">${lOK?'目前沒有即將到站列車':'正在重新連線輕鐵實時資料…'}</span>`;
+  $('rail-update').textContent=new Date().toLocaleTimeString('zh-HK',{hour12:false});
+  $('tml-status').textContent=tOK===TML.length?'正常服務':(tOK?'部分更新':'連線重試');
+  $('lrt-status').textContent=lOK===LRT.length?'正常服務':(lOK?'部分更新':'連線重試');
+}
 const ST=[['屯門',22.3919,113.9767],['元朗公園',22.4446,114.018],['流浮山',22.4678,113.984],['石崗',22.435,114.077],['大埔',22.4509,114.1656],['沙田',22.4029,114.21],['荃灣城門谷',22.3754,114.116],['荃灣可觀',22.394,114.098],['青衣',22.3448,114.1055],['深水埗',22.33,114.162],['九龍城',22.3282,114.1885],['觀塘',22.3115,114.225],['西貢',22.382,114.27],['將軍澳',22.315,114.263],['柴灣',22.264,114.236],['筲箕灣',22.278,114.226],['香港天文台',22.302,114.174]];
 function nearest(lat,lon){const d=(a,b,c,d)=>{const R=6371,p=Math.PI/180,x=Math.sin((c-a)*p/2)**2+Math.cos(a*p)*Math.cos(c*p)*Math.sin((d-b)*p/2)**2;return 2*R*Math.asin(Math.sqrt(x))};return ST.map(s=>({name:s[0],lat:s[1],lon:s[2],km:d(lat,lon,s[1],s[2])})).sort((a,b)=>a.km-b.km)[0]}
 window.gpsStation=null; function locate(){if(!navigator.geolocation){$('gps-place').textContent='瀏覽器不支援 GPS';return}$('gps-place').textContent='定位中…';navigator.geolocation.getCurrentPosition(p=>{const s=nearest(p.coords.latitude,p.coords.longitude);window.gpsStation=s;$('gps-place').textContent=s.name+'附近';loadWeather()},()=>{$('gps-place').textContent='未取得位置';loadWeather()},{enableHighAccuracy:true,timeout:8000,maximumAge:60000})}$('gps-btn').onclick=locate;

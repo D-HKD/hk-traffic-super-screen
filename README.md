@@ -19,3 +19,10 @@ manifest.json
 README.md
 
 Do not change the old `mtr-eta-proxy` Worker.
+
+
+ULTIMATE10 emergency rail fix:
+- The live rail client now uses the existing `/mtr?url=...` proxy first.
+- It falls back to `/tml` and `/lrt` only for older proxy deployments.
+- No Cloudflare Worker change is required when `/mtr` is already deployed.
+- The page will distinguish between a data-empty response and a connection failure.
