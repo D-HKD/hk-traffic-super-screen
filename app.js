@@ -29,12 +29,11 @@ async function proxy(path,params={}){
   const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);return r;
 }
 async function mtr(sta){
-  const u=new URL(MTR);u.searchParams.set("line","TML");u.searchParams.set("sta",sta);u.searchParams.set("lang","TC");
-  return (await proxy("/mtr",{url:u.toString()})).json();
+  // Use the dedicated Worker endpoint so the browser never has to pass a nested URL.
+  return (await proxy("/tml",{sta})).json();
 }
 async function lrt(station){
-  const u=new URL(LRT);u.searchParams.set("station_id",station);u.searchParams.set("lang","tc");
-  return (await proxy("/mtr",{url:u.toString()})).json();
+  return (await proxy("/lrt",{station_id:String(station),with_special:"1"})).json();
 }
 
 function renderTML(sta,j){
@@ -42,8 +41,8 @@ function renderTML(sta,j){
   const d=j?.data?.[`TML-${sta}`]||{};let rows=[];
   for(const dir of ["UP","DOWN"]){
     for(const x of (Array.isArray(d[dir])?d[dir]:[])){
-      const n=mins(x.ttnt??x.time);if(n==null)continue;
-      const dest=x.dest||"";
+      const n=mins(x.ttnt) ?? mins(x.time) ?? mins(x.arrival_time);if(n==null)continue;
+      const dest=x.dest_ch||x.dest||x.dest_en||"";
       const label=/WKS|Wu Kai Sha|烏溪沙/i.test(dest)?"往烏溪沙":/TUM|Tuen Mun|屯門/i.test(dest)?"往屯門":dest;
       rows.push({n,label});
     }
@@ -63,7 +62,7 @@ function renderLRT(group,j){
       if(!group.routes.includes(route))continue;
       const dest=String(r.dest_ch||r.dest_en||"");
       if(group.dest&&!group.dest.some(x=>dest.toLowerCase().includes(x.toLowerCase())))continue;
-      const n=mins(r.time_ch)||mins(r.time_en);
+      const n=mins(r.time_ch) ?? mins(r.time_en) ?? mins(r.time);
       if(n==null)continue;
       rows.push({route,dest,n,plat:p.platform_id});
     }
