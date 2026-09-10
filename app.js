@@ -1,4 +1,4 @@
-const PROXY="https://mtr-eta-proxy.idyl-2014061.workers.dev";
+const PROXY="https://hk-traffic-super-proxy.idyl-2014061.workers.dev";
 const MTR="https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php";
 const LRT="https://rt.data.gov.hk/v1/transport/mtr/lrt/getSchedule";
 const WEATHER="/weather";
