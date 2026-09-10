@@ -41,3 +41,5 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:14px;pa
 .app-shell{width:min(1920px,100%);padding:14px 22px 24px}.top{grid-template-columns:minmax(420px,1.8fr) auto auto auto}.hero-grid{grid-template-columns:1.05fr 1.05fr .9fr}.rail-grid{grid-template-columns:1fr 1fr .72fr}.traffic-grid{grid-template-columns:.82fr 1.45fr .72fr}.mobile-nav{display:none}.panel{border-radius:16px}.map-visual{height:260px}.brand h1{font-size:34px}.desktop-nav a{min-width:105px}}
 /* keyboard / TV remote accessibility */
 :focus-visible{outline:2px solid var(--cyan);outline-offset:2px}.night{filter:brightness(.78) saturate(.85)}
+
+button,.mode,.tool-grid button,.mobile-nav a,.desktop-nav a,.station-row{cursor:pointer} .muted,.loading{color:var(--muted);font-size:11px}
