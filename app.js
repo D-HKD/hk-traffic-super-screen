@@ -67,18 +67,54 @@ locate();loadRail();loadWeather();loadTraffic();setInterval(loadRail,10000);setI
     }
     m.querySelector('.ux-head b').textContent=title;m.querySelector('.ux-content').innerHTML=html;m.style.display='grid';
   };
-  const routeInfo=()=>{
-    const from=$('route-from')?.value||'目前位置',to=$('route-to')?.value||'定富街',mode=document.querySelector('.mode.active')?.dataset.mode||'best';
-    const modeName={best:'最佳方案',rail:'鐵路優先',bus:'巴士優先',walk:'步行'}[mode]||'最佳方案';
-    const traffic=window.lastTraffic?'有交通消息':'交通大致正常';
-    let n=mode==='walk'?28:mode==='rail'?48:mode==='bus'?52:50;
-    if(window.lastTraffic)n+=5;
-    $('route-result-title').textContent='前往 '+to;$('route-result-detail').textContent=`${modeName}・${traffic}`;$('route-min').innerHTML=`${n} <small>分鐘</small>`;
-    toast('路線已更新',`${from} → ${to}，${n} 分鐘（智能估算）`);
+  const geoSearch=async(q)=>{
+    const url='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=hk&q='+encodeURIComponent(q+' 香港');
+    const r=await fetch(url,{headers:{'Accept':'application/json'}}); if(!r.ok) throw Error('geocode '+r.status); const a=await r.json();
+    if(!a.length) throw Error('找不到目的地'); return {lat:+a[0].lat,lon:+a[0].lon,name:a[0].display_name};
+  };
+  const osrm=async(profile,a,b)=>{
+    const u=`https://router.project-osrm.org/route/v1/${profile}/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false&steps=true`;
+    const r=await fetch(u); if(!r.ok) throw Error('route '+r.status); const j=await r.json(); if(j.code!=='Ok'||!j.routes?.[0])throw Error('無路線'); return j.routes[0];
+  };
+  const mapsUrl=(mode,from,to)=>{
+    const gm='https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(from)+'&destination='+encodeURIComponent(to)+'&travelmode='+encodeURIComponent(mode);
+    return gm;
+  };
+  const appleUrl=(mode,to)=>'https://maps.apple.com/?daddr='+encodeURIComponent(to)+'&dirflg='+(mode==='walking'?'w':'d');
+  const formatKm=m=>m<1000?Math.round(m)+' m':(m/1000).toFixed(1)+' km';
+  const openRouteModal=(from,to,origin,dest,results,selected)=>{
+    const traffic=window.lastTraffic?'⚠️ 已讀取最新交通消息':'✓ 暫未發現重點交通消息';
+    const rows=results.map(r=>`<div class="ux-row"><span class="ux-k">${r.icon} ${r.name}</span><span class="ux-v">${r.time}・${r.distance}</span><div>${r.note}</div><button class="ux-btn" data-route-mode="${r.mode}">用 ${r.name} 開始導航</button></div>`).join('');
+    const transit=`<div class="ux-row"><span class="ux-k">🚆 公共交通</span><span class="ux-v">由 Google Maps 即時計算</span><div>會根據當刻屯馬綫、輕鐵、巴士及轉乘情況重新選擇路線。</div><button class="ux-btn" data-route-mode="transit">開啟公共交通實際路線</button></div>`;
+    modal('🧭 AI 智能出行規劃',`<div class="ux-row"><span class="ux-k">起點</span><span class="ux-v">${esc(from)}</span></div><div class="ux-row"><span class="ux-k">目的地</span><span class="ux-v">${esc(to)}</span></div><div class="ux-row"><span class="ux-k">即時環境</span><span class="ux-v">${traffic}</span></div>${rows}${transit}<div class="ux-row"><span class="ux-k">📱 導航 App</span><button class="ux-btn" id="route-google">Google Maps</button> <button class="ux-btn" id="route-apple">Apple 地圖</button></div>`);
+    document.querySelectorAll('[data-route-mode]').forEach(btn=>btn.onclick=()=>{const mode=btn.dataset.routeMode;window.open(mapsUrl(mode==='transit'?'transit':mode==='walking'?'walking':'driving',from,to),'_blank','noopener')});
+    document.getElementById('route-google').onclick=()=>window.open(mapsUrl('transit',from,to),'_blank','noopener');
+    document.getElementById('route-apple').onclick=()=>window.open(appleUrl('driving',to),'_blank','noopener');
+  };
+  const routeInfo=async()=>{
+    const from=$('route-from')?.value||'目前位置',to=($('route-to')?.value||'').trim(),mode=document.querySelector('.mode.active')?.dataset.mode||'best';
+    if(!to){toast('請輸入目的地','例如：湖暉樓、屯門站、觀塘站');$('route-to')?.focus();return;}
+    $('route-result-title').textContent='正在計算實際路線…';$('route-result-detail').textContent='定位及搜尋目的地中';$('route-min').innerHTML='-- <small>分鐘</small>';
+    try{
+      let origin=window.gpsStation?{lat:window.gpsStation.lat,lon:window.gpsStation.lon,name:from}:null;
+      if(!origin){origin=await geoSearch(from==='目前位置'?'天水圍':from)}
+      const dest=await geoSearch(to);
+      const jobs=[]; if(mode==='walk'||mode==='best')jobs.push(osrm('foot',origin,dest).then(r=>({mode:'walking',icon:'🚶',name:'步行',time:Math.max(1,Math.round(r.duration/60))+' 分鐘',distance:formatKm(r.distance),note:'OpenStreetMap 路網實際計算'}))); if(mode==='best'||mode==='rail'||mode==='bus')jobs.push(Promise.resolve({mode:'transit',icon:'🚆',name:mode==='bus'?'巴士 / 公共交通':'公共交通',time:'以導航 App 即時計算',distance:'',note:'會由 Google Maps 按當刻公共交通資料計算'}));
+      if(mode==='best')jobs.push(osrm('driving',origin,dest).then(r=>({mode:'driving',icon:'🚗',name:'駕車',time:Math.max(1,Math.round(r.duration/60))+' 分鐘',distance:formatKm(r.distance),note:'OpenStreetMap 路網實際計算'})));
+      if(mode==='rail')jobs.push(Promise.resolve({mode:'transit',icon:'🚆',name:'鐵路 / 轉乘',time:'以導航 App 即時計算',distance:'',note:'會按屯馬綫、輕鐵及轉乘重新規劃'}));
+      const results=(await Promise.allSettled(jobs)).filter(x=>x.status==='fulfilled').map(x=>x.value);
+      if(!results.length)throw Error('暫時找不到路線');
+      let best=results.find(x=>x.mode==='transit')||results[0]; const numeric=results.filter(x=>/分鐘/.test(x.time)).sort((a,b)=>parseInt(a.time)-parseInt(b.time)); if(mode==='best'&&numeric.length)best=numeric[0];
+      const bestMin=parseInt(best.time); $('route-result-title').textContent='前往 '+to;$('route-result-detail').textContent=(best.name==='公共交通'?'公共交通由 Google Maps 即時計算':'實際路網計算')+'・'+(window.lastTraffic?'已考慮交通消息':'目前交通正常');$('route-min').innerHTML=(Number.isFinite(bestMin)?bestMin:'--')+' <small>分鐘</small>';
+      toast('路線已更新',from+' → '+to);openRouteModal(from,to,origin,dest,results,mode);
+    }catch(e){console.warn(e);$('route-result-title').textContent='暫時無法計算';$('route-result-detail').textContent='可直接用 Google Maps 計算完整公共交通路線';$('route-min').innerHTML='-- <small>分鐘</small>';toast('路線計算失敗','請檢查目的地名稱或按下方按鈕開啟地圖');modal('🧭 路線規劃',`<div class="ux-row"><span class="ux-k">目的地</span><span class="ux-v">${esc(to)}</span></div><div class="ux-row">未能在網站內取得路網資料，但可以直接交由 Google Maps 計算當刻實際路線。</div><button class="ux-btn" id="route-google-fallback">開啟 Google Maps 實際路線</button>`);document.getElementById('route-google-fallback').onclick=()=>window.open(mapsUrl('transit',from,to),'_blank','noopener')}
   };
   $('route-plan-btn')?.addEventListener('click',routeInfo);
-  $('route-to')?.addEventListener('focus',function(){this.removeAttribute('readonly')});
   $('route-to')?.addEventListener('change',routeInfo);
+  $('route-to')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();routeInfo()}});
+  $('route-to')?.addEventListener('focus',function(){this.removeAttribute('readonly')});
+  $('swap-route')?.addEventListener('click',()=>{const a=$('route-from').value,b=$('route-to').value;$('route-from').value=b;$('route-to').value=a;routeInfo()});
+  document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');routeInfo()}));
   $('ai-detail-btn')?.addEventListener('click',()=>modal('AI 出行詳細分析',`<div class="ux-row"><span class="ux-k">出門判斷</span><span class="ux-v">${esc($('ai-advice-title')?.textContent||'分析中')}</span></div><div class="ux-row"><span class="ux-k">鐵路</span><span class="ux-v">${esc($('tml-status')?.textContent||'更新中')} / 輕鐵 ${esc($('lrt-status')?.textContent||'更新中')}</span></div><div class="ux-row"><span class="ux-k">道路</span><span class="ux-v">${esc(window.lastTraffic||'暫未發現重大消息')}</span></div><div class="ux-row"><span class="ux-k">天氣</span><span class="ux-v">${esc(window.lastWeather?.temp??'--')}°C・濕度 ${esc(window.lastWeather?.hum??'--')}%</span></div><div class="ux-row"><span class="ux-k">提醒</span>實際行程時間會隨即時交通變化，出發前再按一次「重新分析路線」。</div>`));
   $('road-detail-btn')?.addEventListener('click',()=>{scrollToId('traffic');modal('主要道路即時狀況',`<div class="ux-row"><span class="ux-k">屯門公路</span><span class="ux-v">${esc($('road-tuenmun-text')?.textContent||'監察中')}</span></div><div class="ux-row"><span class="ux-k">元朗公路</span><span class="ux-v">${esc($('road-yuenlong-text')?.textContent||'監察中')}</span></div><div class="ux-row"><span class="ux-k">青山公路</span><span class="ux-v">${esc($('road-castle-text')?.textContent||'監察中')}</span></div><div class="ux-row"><span class="ux-k">大欖隧道</span><span class="ux-v">${esc($('road-tai-lam-text')?.textContent||'監察中')}</span></div>`)});
   $('map-open-btn')?.addEventListener('click',()=>modal('實時地圖',`<div class="ux-row"><span class="ux-k">目前位置</span><span class="ux-v">${esc($('gps-place')?.textContent||'未定位')}</span></div><div class="ux-row">互動地圖會以你的位置、鐵路及交通消息作為中心。你亦可以直接開啟裝置地圖查看附近道路。</div><button class="ux-btn" id="open-device-map">在地圖 App 開啟</button>`));
@@ -102,10 +138,7 @@ locate();loadRail();loadWeather();loadTraffic();setInterval(loadRail,10000);setI
     else if(/新增|搜尋|開啟/.test(label)){toast(label,'功能已回應')}
     else {toast(label,'功能已回應')}
   })});
-  // Make the destination field genuinely editable on mobile/desktop.
   const rt=$('route-to');if(rt){rt.removeAttribute('readonly');rt.setAttribute('aria-label','目的地');}
-  // Update route when mode changes, and show selected mode.
-  document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>setTimeout(routeInfo,0)));
   // Give rail/LRT status cards a manual refresh action on tap.
   document.querySelectorAll('.rail-panel').forEach(p=>p.addEventListener('dblclick',()=>loadRail()));
 })();

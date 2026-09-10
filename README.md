@@ -1,17 +1,15 @@
-# ULTIMATE11｜香港交通警報中心｜MULTI PLATFORM
+# ULTIMATE11｜香港交通警報中心｜實際路線版
 
-設計目標：
-- PC / Mac：寬屏三欄控制中心
-- iPhone / Android：單欄 + 底部導航
-- iPad / Android Tablet：雙欄
-- Android TV / 小米盒子：16:9 橫向 TV 版，適合遙控器瀏覽
+## 路線規劃
+- 輸入目的地後按「計算實際路線」，或直接按鍵盤 Enter。
+- 有 GPS：以目前定位作起點。
+- 沒有 GPS：以起點文字作地點搜尋。
+- 步行／駕車：使用 OpenStreetMap Nominatim + OSRM 路網服務計算距離及時間。
+- 公共交通／鐵路／巴士：按「開啟公共交通實際路線」交由 Google Maps 即時計算，避免在網站內假造轉乘及班次。
+- 可直接開啟 Google Maps / Apple 地圖。
 
-資料：
-- 屯馬綫 / 輕鐵：官方 DATA.GOV.HK MTR API，經 hk-traffic-super-proxy
-- 天氣：香港天文台
-- 交通消息：運輸署
+## 平台
+PC / Mac / iPhone / Android / Android TV / 小米盒子。
 
-注意：
-- 小米盒子需要可用的 Android TV 瀏覽器並以 HTTPS 開啟網站。
-- GPS、通知權限會按裝置及瀏覽器政策要求授權。
-- 目前 route planner 的「預計分鐘」是前端智能提示，不等同 Google Maps/真正導航路線引擎。
+## 注意
+公共交通的真正轉乘方案需要地圖/運輸路線引擎；本版不再顯示固定假數字。OSRM/Nominatim 是公開服務，繁忙時可能受速率限制。
