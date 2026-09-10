@@ -1,10 +1,10 @@
 {
   "name":"香港交通警報中心 ULTIMATE11",
-  "short_name":"交通警報中心",
+  "short_name":"HK交通警報中心",
   "start_url":"./",
   "display":"standalone",
-  "background_color":"#06111f",
+  "background_color":"#040b14",
   "theme_color":"#06111f",
-  "lang":"zh-Hant",
-  "description":"香港交通即時到站、道路消息、天氣及警報中心"
+  "orientation":"any",
+  "icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"}]
 }

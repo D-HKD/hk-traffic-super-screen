@@ -1,5 +1,8 @@
-const CACHE='hk-traffic-ultimate11-v1';
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./index.html','./style.css?v=ultimate11','./app.js?v=ultimate11','./manifest.json']))));
-self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
-self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)))});
-self.addEventListener('notificationclick',e=>{e.notification.close();e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(cs=>{for(const c of cs)if('focus'in c)return c.focus();return clients.openWindow('./')}))});
+self.addEventListener("install",()=>self.skipWaiting());
+self.addEventListener("activate",e=>e.waitUntil(self.clients.claim()));
+self.addEventListener("push",e=>{
+  let d={title:"香港交通警報中心",body:"有新的交通消息",url:"./"};
+  try{d={...d,...e.data.json()}}catch(_){}
+  e.waitUntil(self.registration.showNotification(d.title,{body:d.body,icon:"icon-192.png",badge:"icon-192.png",tag:d.tag||"hk-traffic",renotify:false,data:{url:d.url||"./"}}));
+});
+self.addEventListener("notificationclick",e=>{e.notification.close();e.waitUntil(clients.matchAll({type:"window",includeUncontrolled:true}).then(cs=>{for(const c of cs){if("focus"in c)return c.focus()}if(clients.openWindow)return clients.openWindow(e.notification.data?.url||"./")}))});
