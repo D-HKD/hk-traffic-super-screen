@@ -61,27 +61,62 @@ function renderTML(station,j){
   root.innerHTML=rows.map(r=>{const [a,b]=etaText(r.n);return `<div class="eta-row"><div><div class="eta-dest">${esc(r.label)}</div><div class="eta-sub">${esc(r.raw)}</div></div><div class="eta-time">${esc(a)} <small>${esc(b)}</small></div></div>`}).join("");
 }
 
+function timeCandidates(v){
+  const out=[];
+  const walk=x=>{
+    if(x==null)return;
+    if(typeof x==="string"||typeof x==="number"){out.push(x);return;}
+    if(Array.isArray(x)){x.forEach(walk);return;}
+    if(typeof x==="object"){
+      for(const k of ["time","ttnt","eta","arrival_time","arrivalTime","time_ch","time_en","minutes","min"]){
+        if(x[k]!=null)walk(x[k]);
+      }
+    }
+  };
+  walk(v);
+  return out;
+}
+
 function renderLRT(group,j){
   const root=$(group.id);if(!root)return;
-  const all=Array.isArray(j?.platform_list)?j.platform_list:[];
+  const platforms=Array.isArray(j?.platform_list)?j.platform_list:[];
   let rows=[];
-  for(const p of all){
-    const route=String(p.route_no||p.route||"");
-    if(!group.routes.includes(route))continue;
-    const d=p.dest_ch||p.destination_ch||p.dest||p.destination||"";
-    if(group.dest && !group.dest.some(x=>String(d).toLowerCase().includes(x.toLowerCase())))continue;
-    const trains=Array.isArray(p.train_list)?p.train_list:[p];
-    for(const x of trains){
-      const n=mins(x.time||x.ttnt||x.eta||x.arrival_time);
-      if(n==null)continue;
-      rows.push({n,route,dest:d});
+  for(const p of platforms){
+    const routes=Array.isArray(p.route_list)?p.route_list:[];
+    for(const r of routes){
+      const route=String(r.route_no||r.route||"").trim();
+      if(!group.routes.includes(route))continue;
+      const dest=r.dest_ch||r.destination_ch||r.dest||r.dest_en||"";
+      if(group.dest && !group.dest.some(x=>String(dest).toLowerCase().includes(x.toLowerCase())))continue;
+
+      // Official LRT response exposes route_list with time_ch/time_en.
+      const rawTimes=[...timeCandidates(r.time_ch),...timeCandidates(r.time_en)];
+      const parsed=[];
+      for(const raw of rawTimes){
+        const n=mins(raw);
+        if(n!=null)parsed.push(n);
+      }
+      [...new Set(parsed)].slice(0,3).forEach(n=>rows.push({
+        n,route,dest,platform:p.platform_id||""
+      }));
     }
   }
   rows.sort((a,b)=>a.n-b.n);
-  if(!rows.length){root.innerHTML='<div class="empty">暫時沒有班次資料</div>';return;}
-  root.innerHTML=rows.slice(0,2).map(r=>{const [a,b]=etaText(r.n);return `<div class="eta-row"><div><div class="eta-dest">🚊 ${esc(r.route)}　${esc(r.dest)}</div><div class="eta-sub">輕鐵實時</div></div><div class="eta-time">${esc(a)} <small>${esc(b)}</small></div></div>`}).join("");
+  const seen=new Set();
+  rows=rows.filter(r=>{const k=r.route+"|"+r.dest+"|"+r.n;if(seen.has(k))return false;seen.add(k);return true;});
+  if(!rows.length){
+    root.innerHTML='<div class="empty"><span class="empty-icon">🚊</span><b>暫時沒有班次資料</b><small>正在等待 MTR 輕鐵實時資料</small></div>';
+    return;
+  }
+  root.innerHTML=rows.slice(0,3).map(r=>{
+    const [a,b]=etaText(r.n);
+    return `<div class="eta-row lrt-eta-row">
+      <div><div class="eta-dest"><span class="route-chip">${esc(r.route)}</span>${esc(r.dest)}</div>
+      <div class="eta-sub">月台 ${esc(r.platform||"--")} ・ 輕鐵實時</div></div>
+      <div class="eta-time">${esc(a)} <small>${esc(b)}</small></div>
+    </div>`;
+  }).join("");
 }
-
 async function loadRail(){
   try{
     const t=await Promise.all(tmlStations.map(s=>mtr(s).then(j=>[s,j])));
@@ -106,22 +141,28 @@ async function loadWeather(){
   try{
     const j=await proxyJson(WEATHER);
     const r=j.weather||j;
-    const temp=r.temperature?.data?.[0]?.value ?? r.temperature?.data?.[0]?.value;
-    const hum=r.humidity?.data?.[0]?.value;
-    const wind=r.wind?.data?.[0]?.value;
-    const desc=r.icon?wxIcon(r.icon):"🌤️";
+    const st=window.currentGPS?.station||HKO_STATIONS.find(x=>x.name==="屯門")||HKO_STATIONS[0];
+    const tempRec=stationTemp(r,st.name)||r.temperature?.data?.[0];
+    const humRec=stationHumidity(r,st.name);
+    const temp=tempRec?.value;
+    const hum=humRec?.value;
+    const desc=r.icon?wxIcon(Array.isArray(r.icon)?r.icon[0]:r.icon):"🌤️";
     lastWeather.temp=temp;
-    lastWeather.text=r.rainfall?.description || "香港目前天氣";
+    lastWeather.text=`${st.name}附近${temp!=null?"目前 "+temp+" 度，":""}天氣`;
     lastWeather.humidity=hum;
     $("weather-icon").textContent=desc;
     $("temp").textContent=(temp??"--")+"°";
-    $("weather-text").textContent=r.rainfall?.description || "香港目前天氣";
+    $("weather-text").textContent=`${st.name}附近實時天氣`;
     $("humidity").textContent=(hum??"--")+"%";
-    $("wind").textContent=wind??"--";
+    $("weather-location").textContent=st.name;
+    $("cmd-location").textContent=st.name;
     $("focus-weather").textContent=(temp!=null?temp+"°C ":"")+"🌤️";
-  }catch(e){console.error(e);$("weather-text").textContent="天氣資料暫時未能取得";$("focus-weather").textContent="暫時離線";}
+  }catch(e){
+    console.error(e);
+    $("weather-text").textContent="天氣資料暫時未能取得";
+    $("focus-weather").textContent="暫時離線";
+  }
 }
-
 function parseTraffic(xml){
   const doc=new DOMParser().parseFromString(xml,"text/xml");
   return [...doc.querySelectorAll("message")].map(m=>({
@@ -159,6 +200,73 @@ setInterval(loadRail,10000);
 setInterval(loadWeather,60000);
 setInterval(loadTraffic,60000);
 
+// ===== GPS + 最近天文台觀測站 =====
+const HKO_STATIONS=[
+  {name:"屯門",lat:22.3919,lon:113.9767},
+  {name:"元朗公園",lat:22.4446,lon:114.0180},
+  {name:"流浮山",lat:22.4678,lon:113.9840},
+  {name:"石崗",lat:22.4350,lon:114.0770},
+  {name:"大埔",lat:22.4509,lon:114.1656},
+  {name:"沙田",lat:22.4029,lon:114.2100},
+  {name:"荃灣城門谷",lat:22.3754,lon:114.1160},
+  {name:"荃灣可觀",lat:22.3940,lon:114.0980},
+  {name:"青衣",lat:22.3448,lon:114.1055},
+  {name:"深水埗",lat:22.3300,lon:114.1620},
+  {name:"九龍城",lat:22.3282,lon:114.1885},
+  {name:"觀塘",lat:22.3115,lon:114.2250},
+  {name:"西貢",lat:22.3820,lon:114.2700},
+  {name:"將軍澳",lat:22.3150,lon:114.2630},
+  {name:"柴灣",lat:22.2640,lon:114.2360},
+  {name:"筲箕灣",lat:22.2780,lon:114.2260},
+  {name:"香港天文台",lat:22.3020,lon:114.1740}
+];
+function geoDistance(a,b,c,d){
+  const R=6371,rad=Math.PI/180;
+  const p1=a*rad,p2=c*rad,dp=(c-a)*rad,dq=(d-b)*rad;
+  const x=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dq/2)**2;
+  return 2*R*Math.asin(Math.sqrt(x));
+}
+function nearestStation(lat,lon){
+  return HKO_STATIONS.reduce((best,s)=>{
+    const km=geoDistance(lat,lon,s.lat,s.lon);
+    return !best||km<best.km?{...s,km}:best;
+  },null);
+}
+function stationTemp(data,name){
+  const arr=Array.isArray(data?.temperature?.data)?data.temperature.data:[];
+  return arr.find(x=>String(x.place).includes(name))||null;
+}
+function stationHumidity(data,name){
+  const arr=Array.isArray(data?.humidity?.data)?data.humidity.data:[];
+  return arr.find(x=>String(x.place).includes(name))||arr[0]||null;
+}
+function setGpsUI(position){
+  const lat=position.coords.latitude,lon=position.coords.longitude;
+  const st=nearestStation(lat,lon);
+  window.currentGPS={lat,lon,station:st};
+  $("gps-status").textContent="🟢 GPS 已取得位置";
+  $("gps-place").textContent=`你目前位置（約 ${lat.toFixed(4)}, ${lon.toFixed(4)}）`;
+  $("gps-coords").textContent=`座標：${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+  $("gps-station").textContent=`最近觀測站：${st.name}`;
+  $("gps-distance").textContent=`約 ${st.km.toFixed(1)} km`;
+  $("weather-location").textContent=st.name;
+  $("cmd-location").textContent=st.name;
+  $("voice-preview").textContent=`已定位至你目前位置，將使用最近的天文台觀測站「${st.name}」作天氣報告。`;
+  loadWeather();
+}
+function gpsError(err){
+  const msg=err.code===1?"你拒絕了位置權限":err.code===2?"暫時無法取得位置":"GPS 定位逾時";
+  $("gps-status").textContent="⚠️ "+msg+"，可按按鈕重試";
+  $("weather-location").textContent="香港";
+}
+function requestGPS(){
+  if(!navigator.geolocation){$("gps-status").textContent="⚠️ 此瀏覽器不支援 GPS";return;}
+  $("gps-status").textContent="📡 正在取得 GPS…";
+  navigator.geolocation.getCurrentPosition(setGpsUI,gpsError,{enableHighAccuracy:true,timeout:12000,maximumAge:300000});
+}
+$("gps-btn").addEventListener("click",requestGPS);
+window.addEventListener("load",()=>setTimeout(requestGPS,700));
+
 // ===== 語音報告：男／女聲 + 自然語速 =====
 let voiceEnabled=false, voiceTimer=null;
 let lastWeather={temp:null,text:"",humidity:null};
@@ -189,9 +297,10 @@ function chooseVoice(gender){
 function speakReport(){
   if(!("speechSynthesis" in window)){ $("voice-state").textContent="裝置不支援"; return; }
   const temp=lastWeather.temp!=null?`目前氣溫 ${lastWeather.temp} 度。`:"";
-  const weather=lastWeather.text?`天氣${lastWeather.text}。`:"";
+  const weather=lastWeather.text?`${lastWeather.text}。`:"";
   const traffic=lastTraffic.has?`交通方面，${lastTraffic.detail}。`:"交通方面，目前未發現屯門及元朗有特別交通消息。";
-  const text=`香港交通即時報告。${temp}${weather}${traffic}${lastRail}。請留意最新交通情況。`;
+  const place=window.currentGPS?.station?.name||"香港";
+  const text=`香港交通即時報告。你目前位置附近的天氣觀測站是${place}。${temp}${weather}${traffic}${lastRail}。請留意最新交通情況。`;
   $("voice-preview").textContent=text;
   $("voice-state").textContent="播報中";
   speechSynthesis.cancel();

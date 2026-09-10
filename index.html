@@ -39,18 +39,20 @@
     </div>
 
     <div class="hero-card weather-hero">
-      <div class="section-title"><span>🌤️</span> 香港天氣</div>
+      <div class="section-title"><span>🌤️</span> 你所在地區天氣</div>
       <div class="weather-main">
         <div id="weather-icon" class="weather-icon">🌤️</div>
         <div>
           <div id="temp" class="temp">--°</div>
-          <div id="weather-text" class="weather-text">載入中…</div>
+          <div id="weather-text" class="weather-text">等待定位…</div>
         </div>
       </div>
       <div class="weather-row">
         <span>💧 濕度 <b id="humidity">--%</b></span>
-        <span>💨 風 <b id="wind">--</b></span>
+        <span>📍 <b id="weather-location">未定位</b></span>
       </div>
+      <button id="gps-btn" class="gps-btn" type="button">📍 開啟 GPS 定位</button>
+      <div id="gps-status" class="gps-status">首次使用請按上面按鈕並允許位置權限</div>
     </div>
 
     <div class="hero-card traffic-hero">
@@ -58,6 +60,16 @@
       <div id="traffic-status" class="traffic-status">檢查中…</div>
       <div id="traffic-detail" class="traffic-detail">正在讀取運輸署最新交通消息</div>
     </div>
+  </section>
+
+  <section class="command-strip">
+    <div class="command-item active"><span>🚆</span><b>屯馬綫</b><small>LIVE ETA</small></div>
+    <div class="command-arrow">➜</div>
+    <div class="command-item green"><span>🚊</span><b>輕鐵</b><small>LIVE ETA</small></div>
+    <div class="command-arrow">➜</div>
+    <div class="command-item blue"><span>🌦️</span><b>所在地天氣</b><small id="cmd-location">GPS</small></div>
+    <div class="command-arrow">➜</div>
+    <div class="command-item orange"><span>🚦</span><b>道路</b><small>LIVE</small></div>
   </section>
 
   <section class="panel">
@@ -103,6 +115,18 @@
         <div id="LRT240"></div>
       </article>
     </div>
+  </section>
+
+  <section class="gps-panel panel">
+    <div class="panel-head">
+      <div><h2>📍 GPS 智能天氣</h2><p>用你目前位置選取最近的香港天文台觀測站</p></div>
+      <div class="update-badge" id="gps-distance">--</div>
+    </div>
+    <div class="gps-dashboard">
+      <div class="gps-big">📍 <b id="gps-place">未取得位置</b></div>
+      <div class="gps-meta"><span id="gps-coords">座標：--</span><span id="gps-station">最近觀測站：--</span></div>
+    </div>
+    <div class="gps-note">GPS 本身不是氣象感測器；系統會用你的位置計算最近的天文台官方觀測站，再用該站的實時溫度／濕度作報告。</div>
   </section>
 
   <section class="voice-panel panel">
