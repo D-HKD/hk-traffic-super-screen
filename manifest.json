@@ -1,9 +1,9 @@
 {
-  "name": "香港交通控制中心",
-  "short_name": "HK Transport Control",
-  "start_url": ".",
-  "display": "fullscreen",
-  "background_color": "#020b14",
-  "theme_color": "#03111f",
-  "lang": "zh-Hant"
+  "name":"香港交通控制中心",
+  "short_name":"HK Traffic Control",
+  "start_url":".",
+  "display":"fullscreen",
+  "background_color":"#020914",
+  "theme_color":"#020b16",
+  "lang":"zh-Hant"
 }

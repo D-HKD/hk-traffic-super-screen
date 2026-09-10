@@ -3,190 +3,82 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#03111f">
+<meta name="theme-color" content="#020b16">
 <title>香港交通控制中心</title>
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css?v=ultimate4">
+<link rel="stylesheet" href="style.css?v=ultimate6">
 </head>
 <body>
 <div class="scanlines"></div>
-
-<header class="control-header">
-  <div class="brand-block">
-    <div class="hk-emblem">✦</div>
-    <div>
-      <div class="brand-cn">香港交通控制中心</div>
-      <div class="brand-en">HONG KONG TRANSPORT CONTROL CENTER</div>
-      <div class="brand-sub">連繫全城・實時交通・智慧出行</div>
-    </div>
-  </div>
-
-  <div class="header-clock">
-    <div id="date">2026年9月10日</div>
-    <strong id="clock">--:--:--</strong>
-  </div>
-
-  <div class="header-weather">
-    <div class="weather-orb" id="weather-icon">☀️</div>
-    <div>
-      <b id="header-temp">--°C</b>
-      <span id="header-weather">載入中</span>
-    </div>
-  </div>
-
-  <div class="system-health">
-    <span>濕度 <b id="header-humidity">--%</b></span>
-    <span>GPS <b id="header-gps">待命</b></span>
-    <span>系統 <i id="system-dot"></i></span>
-  </div>
+<header class="topbar">
+  <div class="brand"><div class="emblem">✦</div><div><h1>香港交通控制中心</h1><p>HONG KONG TRANSPORT CONTROL CENTER</p><small>智慧出行・實時交通・更美好香港</small></div></div>
+  <div class="head-card clock-card"><span id="date">--</span><strong id="clock">--:--:--</strong></div>
+  <div class="head-card weather-head"><span id="weather-icon">☀️</span><div><b id="header-temp">--°C</b><small id="header-weather">載入中</small></div></div>
+  <div class="head-card metrics"><span>濕度 <b id="header-humidity">--%</b></span><span>GPS <b id="header-gps">待命</b></span><span>系統 <i id="system-dot"></i></span></div>
 </header>
 
-<nav class="status-rail">
-  <div class="status-box rail"><span>🚆</span><b>屯馬綫</b><em id="tml-status">正常服務</em></div>
-  <div class="status-box lrt"><span>🚊</span><b>輕鐵</b><em id="lrt-status">正常服務</em></div>
-  <div class="status-box bus"><span>🚍</span><b>巴士</b><em id="bus-status">交通消息</em></div>
-  <div class="status-box road"><span>🚗</span><b>主要道路</b><em id="road-status">監察中</em></div>
-  <div class="status-box weather"><span>🌦️</span><b>天氣</b><em id="weather-status">正常</em></div>
-</nav>
+<section class="status-grid">
+  <div class="status-card rail"><span>🚆</span><div><b>屯馬綫</b><strong id="tml-status">更新中</strong></div></div>
+  <div class="status-card lrt"><span>🚊</span><div><b>輕鐵 LRT</b><strong id="lrt-status">更新中</strong></div></div>
+  <div class="status-card bus"><span>🚌</span><div><b>巴士</b><strong id="bus-status">監察中</strong></div></div>
+  <div class="status-card road"><span>🚗</span><div><b>主要道路</b><strong id="road-status">監察中</strong></div></div>
+  <div class="status-card alert"><span>📢</span><div><b>最新消息</b><strong id="alert-count">載入中</strong></div></div>
+</section>
 
 <main class="dashboard">
-  <aside class="side-nav">
-    <button class="side-btn active">⌂<small>首頁</small></button>
-    <button class="side-btn">🚆<small>地鐵<br>MTR</small></button>
-    <button class="side-btn">🚊<small>輕鐵<br>LRT</small></button>
-    <button class="side-btn">🚗<small>交通路況</small></button>
-    <button class="side-btn">☁️<small>天氣</small></button>
-    <button class="side-btn" id="gps-side">📍<small>GPS 位置</small></button>
-    <button class="side-btn" id="fullscreen-btn">⛶<small>全螢幕</small></button>
-  </aside>
-
-  <section class="map-section panel-glow">
-    <div class="map-head">
-      <div>
-        <h1>香港鐵路及輕鐵實時運行圖</h1>
-        <p>Hong Kong MTR & Light Rail Live Map</p>
-      </div>
-      <div class="live-chip"><i></i> LIVE <span id="rail-update">--</span></div>
-    </div>
-
-    <div class="map-canvas" id="map-canvas">
-      <div class="map-grid"></div>
-      <div class="city-label l1">屯門</div>
-      <div class="city-label l2">兆康</div>
-      <div class="city-label l3">天水圍</div>
-      <div class="city-label l4">朗屏</div>
-      <div class="city-label l5">天榮</div>
-
-      <svg class="route-svg" viewBox="0 0 900 650" preserveAspectRatio="none" aria-label="香港西北鐵路示意圖">
-        <defs>
-          <filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        </defs>
-        <path class="route route-red" d="M105 535 C170 480 185 405 235 350 S330 275 390 235 S490 185 575 115 S690 85 810 55"/>
-        <path class="route route-purple" d="M85 470 C180 460 250 420 330 360 S430 290 520 255 S640 215 810 205"/>
-        <path class="route route-green" d="M100 555 C200 520 290 505 365 450 S490 370 565 340 S700 310 835 300"/>
-        <path class="route route-orange" d="M190 560 C280 555 345 520 405 485 S530 420 600 410 S725 390 830 365"/>
-        <path class="route route-cyan" d="M80 350 C180 330 245 305 315 270 S430 210 505 165"/>
-        <g class="station-nodes">
-          <circle cx="105" cy="535" r="9"/><circle cx="235" cy="350" r="9"/><circle cx="390" cy="235" r="9"/>
-          <circle cx="575" cy="115" r="9"/><circle cx="810" cy="55" r="9"/>
-          <circle cx="85" cy="470" r="9"/><circle cx="330" cy="360" r="9"/><circle cx="520" cy="255" r="9"/>
-          <circle cx="810" cy="205" r="9"/>
-          <circle cx="100" cy="555" r="9"/><circle cx="365" cy="450" r="9"/><circle cx="565" cy="340" r="9"/>
-          <circle cx="835" cy="300" r="9"/>
-        </g>
-      </svg>
-
-      <div class="map-station s-tum">屯門<span>Tuen Mun</span></div>
-      <div class="map-station s-sih">兆康<span>Siu Hong</span></div>
-      <div class="map-station s-tis">天水圍<span>Tin Shui Wai</span></div>
-      <div class="map-station s-lop">朗屏<span>Long Ping</span></div>
-      <div class="map-station s-twi">天榮<span>Tin Wing</span></div>
-
-      <div class="map-train t1" id="map-train-1">🚆</div>
-      <div class="map-train t2" id="map-train-2">🚆</div>
-      <div class="map-train lrt-train" id="map-lrt-train">🚊</div>
-      <div class="gps-pulse" id="gps-pulse"><i></i><b>你在這裡</b></div>
-
-      <div class="map-tools">
-        <button>⌖</button><button>＋</button><button>−</button>
-      </div>
-      <div class="map-caption">示意運行圖 · 非導航地圖</div>
+  <section class="panel tml-panel">
+    <div class="panel-head"><div><span class="icon red">🚆</span><div><h2>屯馬綫 <small>MTR</small></h2><p>下一班列車</p></div></div><em id="rail-update">--:--</em></div>
+    <div class="station-list">
+      <article class="station"><div><b>天水圍站</b><small>TIS</small></div><div id="TIS-eta" class="eta-list"><span class="muted">載入中…</span></div></article>
+      <article class="station"><div><b>朗屏站</b><small>LOP</small></div><div id="LOP-eta" class="eta-list"><span class="muted">載入中…</span></div></article>
+      <article class="station"><div><b>屯門站</b><small>TUM</small></div><div id="TUM-eta" class="eta-list"><span class="muted">載入中…</span></div></article>
     </div>
   </section>
 
-  <aside class="right-stack">
-    <section class="panel-glow location-panel">
-      <div class="panel-title"><span>📍</span><b>我的位置 (GPS)</b><em id="gps-pill">未連接</em></div>
-      <div class="location-place" id="gps-place">等待定位</div>
-      <div class="location-coords" id="gps-coords">座標：--</div>
-      <button id="gps-btn" class="control-btn green-btn">📍 開始定位</button>
-    </section>
+  <section class="panel lrt-panel">
+    <div class="panel-head"><div><span class="icon amber">🚊</span><div><h2>輕鐵 <small>LRT</small></h2><p>實時到站</p></div></div><em>LIVE</em></div>
+    <div id="LRT-eta" class="lrt-list"><span class="muted">載入中…</span></div>
+  </section>
 
-    <section class="panel-glow weather-panel">
-      <div class="panel-title"><span>☁️</span><b>所在地天氣</b><em id="weather-station">--</em></div>
-      <div class="weather-big">
-        <div id="weather-icon-large">☀️</div>
-        <div><strong id="big-temp">--°C</strong><span id="big-weather">--</span></div>
-      </div>
-      <div class="metric-row"><span>💧 濕度</span><b id="big-humidity">--%</b></div>
-      <div class="metric-row"><span>💨 風</span><b id="big-wind">--</b></div>
-    </section>
-
-    <section class="panel-glow alert-panel">
-      <div class="panel-title"><span>🚨</span><b>最新交通消息</b><em id="alert-time">--</em></div>
-      <div id="alert-list" class="alert-list"><div class="muted">載入中…</div></div>
-    </section>
-  </aside>
-
-  <section class="eta-zone">
-    <div class="eta-card tml-card">
-      <div class="eta-head">
-        <div><span>🚆</span><b>屯馬綫</b><small>MTR</small></div>
-        <a>更多 ›</a>
-      </div>
-      <div class="eta-stations">
-        <div class="eta-station"><h3>天水圍站</h3><div id="TIS-eta"></div></div>
-        <div class="eta-station"><h3>朗屏站</h3><div id="LOP-eta"></div></div>
-        <div class="eta-station"><h3>屯門站</h3><div id="TUM-eta"></div></div>
-      </div>
-    </div>
-
-    <div class="eta-card lrt-card">
-      <div class="eta-head">
-        <div><span>🚊</span><b>輕鐵</b><small>LRT</small></div>
-        <a>更多 ›</a>
-      </div>
-      <div id="LRT-eta" class="lrt-live-list"><div class="muted">載入中…</div></div>
-    </div>
-
-    <div class="eta-card local-weather-card">
-      <div class="eta-head">
-        <div><span>🌦️</span><b>所在地天氣</b><small id="weather-card-place">GPS</small></div>
-        <a id="weather-refresh">↻</a>
-      </div>
-      <div class="weather-card-main"><span id="weather-card-icon">☀️</span><strong id="weather-card-temp">--°</strong></div>
-      <div id="weather-card-text">等待定位</div>
-      <div class="weather-mini"><span>💧 <b id="weather-card-hum">--%</b></span><span>📍 <b id="weather-card-station">--</b></span></div>
+  <section class="panel traffic-panel">
+    <div class="panel-head"><div><span class="icon green">🚗</span><div><h2>主要道路實況</h2><p>運輸署交通消息</p></div></div><em id="traffic-update">--:--</em></div>
+    <div class="road-list">
+      <div><b>屯門公路</b><span id="road-tuenmun" class="road-dot ok">●</span><strong id="road-tuenmun-text">監察中</strong></div>
+      <div><b>元朗公路</b><span class="road-dot ok">●</span><strong>實時監察</strong></div>
+      <div><b>青山公路</b><span class="road-dot watch">●</span><strong>留意交通消息</strong></div>
+      <div><b>大欖隧道</b><span class="road-dot ok">●</span><strong>實時監察</strong></div>
     </div>
   </section>
 
-  <section class="control-strip panel-glow">
-    <button id="voice-start" class="control-btn voice">🔊 開始語音報告</button>
-    <button id="voice-now" class="control-btn">📢 立即報告一次</button>
-    <button id="voice-stop" class="control-btn danger">⏹ 停止</button>
-    <select id="voice-gender"><option value="female">👩 女聲</option><option value="male">👨 男聲</option><option value="auto">🤖 自動</option></select>
-    <select id="voice-interval"><option value="5">每 5 分鐘</option><option value="10" selected>每 10 分鐘</option><option value="15">每 15 分鐘</option><option value="30">每 30 分鐘</option></select>
-    <button id="night-btn" class="control-btn">🌙 夜間模式</button>
-    <button id="full-btn" class="control-btn">⛶ 全螢幕</button>
+  <section class="panel alert-panel">
+    <div class="panel-head"><div><span class="icon red">📢</span><div><h2>最新交通消息</h2><p>屯門・元朗・天水圍優先</p></div></div><em id="alert-time">--:--</em></div>
+    <div id="alert-list" class="alerts"><span class="muted">載入中…</span></div>
+  </section>
+
+  <section class="panel gps-weather-panel">
+    <div class="panel-head"><div><span class="icon cyan">📍</span><div><h2>所在地天氣 <small>GPS</small></h2><p id="gps-place">等待定位</p></div></div><button id="gps-btn" class="mini-btn">重新定位</button></div>
+    <div class="weather-main"><span id="weather-icon-large">☀️</span><div><strong id="big-temp">--°C</strong><b id="big-weather">--</b></div></div>
+    <div class="weather-metrics"><span>濕度 <b id="big-humidity">--%</b></span><span>風速 <b id="big-wind">--</b></span><span>觀測站 <b id="weather-station">--</b></span></div>
+    <div id="gps-coords" class="coords">座標：--</div>
+    <div class="gps-line"><i></i><b id="gps-pill">未連接</b><span>GPS 用於選取最近天文台觀測站</span></div>
+  </section>
+
+  <section class="panel voice-panel">
+    <div class="panel-head"><div><span class="icon cyan">🔊</span><div><h2>智能語音報告</h2><p>交通・天氣・班次</p></div></div><em>VOICE</em></div>
+    <div class="voice-controls">
+      <select id="voice-gender"><option value="female">👩 女聲</option><option value="male">👨 男聲</option><option value="auto">🤖 自動</option></select>
+      <select id="voice-interval"><option value="5">每 5 分鐘</option><option value="10" selected>每 10 分鐘</option><option value="15">每 15 分鐘</option><option value="30">每 30 分鐘</option></select>
+      <button id="voice-now" class="primary">立即報告一次</button>
+      <button id="voice-start">開始自動報告</button>
+      <button id="voice-stop" class="danger">停止</button>
+      <button id="night-btn">🌙 夜間</button>
+      <button id="full-btn">⛶ 全螢幕</button>
+    </div>
   </section>
 </main>
 
-<footer class="control-footer">
-  <div>🏙️ HONG KONG <b>智慧出行・連繫未來</b></div>
-  <div>資料：港鐵・運輸署・香港天文台　最後更新 <b id="last-update">--</b></div>
-  <div><i id="footer-dot"></i> 系統正常</div>
-</footer>
-
-<script src="app.js?v=ultimate4"></script>
+<footer><div>H O N G&nbsp;&nbsp;K O N G　<b>智慧出行・連繫未來</b></div><div>資料來源：港鐵・運輸署・香港天文台　最後更新 <b id="last-update">--</b></div><div><i id="footer-dot"></i> 系統正常</div></footer>
+<div id="gps-status" hidden></div>
+<script src="app.js?v=ultimate6"></script>
 </body>
 </html>
