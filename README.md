@@ -1,58 +1,34 @@
-# 香港交通 SUPER SCREEN
+# 香港交通控制中心 ULTIMATE 4
 
-第一版包括：
-- 屯馬綫：朗屏、天水圍、屯門實時 ETA
-- 輕鐵：天榮、屯門站→屯門碼頭、兆禧→屯門站
-- 香港天文台目前天氣
-- 運輸署特別交通消息
-- 屯門／元朗相關交通消息焦點
-- 大型時鐘、LIVE 狀態、跑馬燈
-- 手機／平板／便攜顯示器響應式版
+以「香港交通控制中心」風格重新設計：
+- 大型動態鐵路／輕鐵示意運行圖
+- 屯馬綫、輕鐵實時 ETA
+- 列車沿線動畫
+- GPS 位置光點
+- GPS → 最近香港天文台觀測站 → 所在地區天氣
+- 天氣圖示／狀態
+- 最新運輸署交通消息
+- 交通狀態燈號
+- 男聲／女聲／自動語音報告
+- 5 / 10 / 15 / 30 分鐘自動語音
+- 全螢幕／夜間模式
+- 手機／平板／顯示器響應式
 
-## Cloudflare Worker
-請把 cloudflare/worker.js 全部貼入你現有的 `mtr-eta-proxy` Worker。
-Worker URL 預設仍然是：
-https://mtr-eta-proxy.idyl-2014061.workers.dev
+## GitHub
+上傳根目錄：
+index.html
+style.css
+app.js
+manifest.json
+README.md
 
-## GitHub Pages
-把 index.html / style.css / app.js / manifest.json 上傳到 GitHub repository 根目錄。
+cloudflare/worker.js 可保留作 Worker 備份。
 
-## 注意
-這個版本使用官方 MTR、香港天文台及運輸署開放數據。交通「大致正常」是根據運輸署特別交通消息作提示，不等同完整即時車速地圖。
+## Cloudflare
+本網站使用新 Worker：
+https://hk-traffic-super-proxy.idyl-2014061.workers.dev
 
+不要修改舊 mtr-eta-proxy。
 
-## 🔊 語音報告
-新版加入瀏覽器內置語音：
-- 按「開始語音報告」後即時讀一次
-- 可選每 5 / 10 / 15 / 30 分鐘自動報告
-- 報告內容包括天氣、屯門／元朗交通消息、屯馬綫狀態
-- 語音使用裝置本身可用的中文／廣東話語音；不同裝置提供的聲音可能不同
-- iPhone/iPad 若瀏覽器限制自動播放，第一次必須由使用者按鈕啟動語音
-
-語音功能使用 Web Speech API 的 SpeechSynthesis。 
-
-
-## Ultimate 版新增
-- 🔊 立即報告一次
-- ⏱️ 5 / 10 / 15 / 30 分鐘自動報告
-- ⏹️ 停止語音
-- 👩 女聲 / 👨 男聲 / 自動最佳中文聲線
-- 🎙️ 語速降低至較自然的 0.82，減少機械感
-- 🗺️ 香港交通 LIVE 中心
-- 🚗 屯門公路／元朗公路／青山公路／大欖隧道交通摘要
-- 官方 HKeMobility 交通地圖入口
-- 運輸署行車速度圖第二代資料目前每 5 分鐘更新
-
-### 關於真人聲
-瀏覽器的 SpeechSynthesis 使用裝置本身提供的 TTS 聲音，所以不能在純前端程式保證「真人錄音級」聲線。男／女選擇會在可用中文聲音中盡量匹配；如果裝置沒有提供男女標籤，會退回最佳可用中文聲音。若日後要做到真正廣東話真人級 TTS，可再接第三方雲端 TTS API。
-
-
-## v3：GPS + LRT 修正版 + 視覺升級
-- 修正 Light Rail API 新格式：`platform_list -> route_list -> time_ch/time_en`
-- 輕鐵最多顯示 3 班並顯示路線、目的地、月台
-- 新增 GPS 定位
-- 以 GPS 計算最近的香港天文台官方觀測站
-- 天氣卡會顯示最近觀測站的實時溫度／濕度
-- 語音報告會讀出目前位置附近的觀測站名稱
-- 新增交通控制中心風格的路線狀態條
-- 增加 GPS 狀態、距離及座標資訊
+## 資料
+MTR / Light Rail 官方實時 API、香港天文台 Open Data、運輸署交通消息。

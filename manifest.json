@@ -1,9 +1,9 @@
 {
-  "name": "香港交通 SUPER SCREEN",
-  "short_name": "HK Traffic",
+  "name": "香港交通控制中心",
+  "short_name": "HK Transport Control",
   "start_url": ".",
-  "display": "standalone",
-  "background_color": "#07182e",
-  "theme_color": "#07182e",
+  "display": "fullscreen",
+  "background_color": "#020b14",
+  "theme_color": "#03111f",
   "lang": "zh-Hant"
 }
