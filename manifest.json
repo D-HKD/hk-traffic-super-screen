@@ -1,9 +1,10 @@
 {
-  "name":"香港交通控制中心",
-  "short_name":"HK Traffic Control",
-  "start_url":".",
-  "display":"fullscreen",
-  "background_color":"#020914",
-  "theme_color":"#020b16",
-  "lang":"zh-Hant"
+  "name":"香港交通警報中心 ULTIMATE11",
+  "short_name":"交通警報中心",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#06111f",
+  "theme_color":"#06111f",
+  "lang":"zh-Hant",
+  "description":"香港交通即時到站、道路消息、天氣及警報中心"
 }
