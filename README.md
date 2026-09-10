@@ -15,3 +15,11 @@
 `https://hk-traffic-super-proxy.idyl-2014061.workers.dev`
 
 不要修改舊的 `mtr-eta-proxy` Worker。
+
+
+ULTIMATE7 fixes:
+- Tuen Ma Line and Light Rail now use the stable `/mtr?url=...` proxy endpoint, so no new Cloudflare Worker route is required if the existing proxy already supports `/mtr`.
+- Rail loading uses Promise.allSettled so one failed Light Rail station cannot hide all rail data.
+- Mobile clock is smaller and constrained to prevent overflow.
+- Mobile status cards no longer create a clipped horizontal strip.
+- This is still a web/PWA dashboard. It is not a native Apple CarPlay app; the dashboard itself cannot be rendered as a CarPlay screen from Safari/GitHub Pages.
