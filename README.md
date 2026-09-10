@@ -1,25 +1,20 @@
-# 香港交通控制中心 ULTIMATE 6
+# 香港交通控制中心 ULTIMATE 8
 
-緊湊型香港交通控制中心介面。
+全新重新定義的交通資訊頁面。這版不再使用大型鐵路運行圖，主頁直接突出：
 
-## 內容
 - 屯馬綫實時 ETA：天水圍、朗屏、屯門
-- 輕鐵實時 ETA：天榮、屯門站、兆禧
-- 運輸署最新交通消息
-- 主要道路監察狀態
-- GPS 定位 + 最近天文台觀測站天氣
-- 智能語音報告、夜間模式、全螢幕
+- 輕鐵實時 ETA：天榮、屯門、兆禧
+- 主要道路交通狀態
+- 最新運輸署交通消息
+- GPS 選取最近天文台觀測站及天氣
+- 語音即時／定時報告
+- 手機直向版重新排版
 
-## Cloudflare Worker
-網站使用：
-`https://hk-traffic-super-proxy.idyl-2014061.workers.dev`
+## GitHub
+替換：`index.html`、`style.css`、`app.js`、`manifest.json`、`README.md`。
 
-不要修改舊的 `mtr-eta-proxy` Worker。
+## Cloudflare
+`cloudflare/worker.js` 是配套 Proxy。它保留 `/tml`、`/lrt`、`/mtr`、`/weather`、`/trafficnews`。如果現有 `hk-traffic-super-proxy` 已經能正常提供這些 endpoint，可以不重新部署；如仍出現「連線重試」，再把此 worker 更新。
 
-
-ULTIMATE7 fixes:
-- Tuen Ma Line and Light Rail now use the stable `/mtr?url=...` proxy endpoint, so no new Cloudflare Worker route is required if the existing proxy already supports `/mtr`.
-- Rail loading uses Promise.allSettled so one failed Light Rail station cannot hide all rail data.
-- Mobile clock is smaller and constrained to prevent overflow.
-- Mobile status cards no longer create a clipped horizontal strip.
-- This is still a web/PWA dashboard. It is not a native Apple CarPlay app; the dashboard itself cannot be rendered as a CarPlay screen from Safari/GitHub Pages.
+## 資料來源
+MTR 官方實時列車／輕鐵 API、運輸署交通消息、香港天文台開放數據。

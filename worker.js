@@ -14,7 +14,7 @@ export default {
     });
 
     if (u.pathname === "/") return json({
-      ok:true, service:"Hong Kong Traffic Control Center Proxy", version:"ULTIMATE-6",
+      ok:true, service:"Hong Kong Traffic Control Center Proxy", version:"ULTIMATE-8",
       endpoints:["/tml?sta=TIS","/lrt?station_id=500&with_special=1","/weather","/trafficnews"]
     });
 
@@ -48,7 +48,7 @@ export default {
     }
 
     try {
-      const r = await fetch(target, { headers:{"User-Agent":"HKTransportControlCenter/ULTIMATE-6"} });
+      const r = await fetch(target, { headers:{"User-Agent":"HKTransportControlCenter/ULTIMATE-8"} });
       const body = await r.text();
       return new Response(body, { status:r.status, headers:{...cors,"Content-Type":type} });
     } catch (e) {
