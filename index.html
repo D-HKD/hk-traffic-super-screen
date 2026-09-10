@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07182e">
+  <title>香港交通 SUPER SCREEN</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">🚆</div>
+    <div>
+      <h1>香港交通 <span>SUPER SCREEN</span></h1>
+      <p>屯馬綫・輕鐵・交通消息・天氣 LIVE</p>
+    </div>
+  </div>
+  <div class="top-right">
+    <div id="clock">--:--:--</div>
+    <div class="top-actions">
+      <button id="voice-start" class="voice-btn" type="button">🔊 開始語音報告</button>
+      <button id="voice-stop" class="voice-btn stop" type="button">⏹ 停止</button>
+    </div>
+    <div class="live-pill"><i></i> LIVE</div>
+  </div>
+</header>
+
+<main>
+  <section class="hero-grid">
+    <div class="hero-card railway-hero">
+      <div class="section-title"><span>🚆</span> 屯馬綫</div>
+      <div class="route-line">
+        <span>屯門</span><b>→</b><span>烏溪沙</span>
+      </div>
+      <div id="tml-summary" class="big-summary">載入中…</div>
+      <div class="mini-note">朗屏・天水圍・屯門　每 10 秒更新</div>
+    </div>
+
+    <div class="hero-card weather-hero">
+      <div class="section-title"><span>🌤️</span> 香港天氣</div>
+      <div class="weather-main">
+        <div id="weather-icon" class="weather-icon">🌤️</div>
+        <div>
+          <div id="temp" class="temp">--°</div>
+          <div id="weather-text" class="weather-text">載入中…</div>
+        </div>
+      </div>
+      <div class="weather-row">
+        <span>💧 濕度 <b id="humidity">--%</b></span>
+        <span>💨 風 <b id="wind">--</b></span>
+      </div>
+    </div>
+
+    <div class="hero-card traffic-hero">
+      <div class="section-title"><span>🚦</span> 交通狀況</div>
+      <div id="traffic-status" class="traffic-status">檢查中…</div>
+      <div id="traffic-detail" class="traffic-detail">正在讀取運輸署最新交通消息</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>🚆 鐵路實時到站</h2>
+        <p>下一班列車</p>
+      </div>
+      <div class="update-badge" id="rail-update">--</div>
+    </div>
+
+    <div class="station-grid">
+      <article class="station-card">
+        <div class="station-head"><span class="station-code">LOP</span><h3>朗屏</h3></div>
+        <div id="LOP"></div>
+      </article>
+      <article class="station-card">
+        <div class="station-head"><span class="station-code">TIS</span><h3>天水圍</h3></div>
+        <div id="TIS"></div>
+      </article>
+      <article class="station-card">
+        <div class="station-head"><span class="station-code">TUM</span><h3>屯門</h3></div>
+        <div id="TUM"></div>
+      </article>
+    </div>
+
+    <div class="lrt-title">
+      <h2>🚊 輕鐵</h2>
+      <span>最多顯示 2 班</span>
+    </div>
+
+    <div class="lrt-grid">
+      <article class="station-card lrt-card">
+        <div class="station-head"><span class="station-code green">500</span><h3>天榮</h3></div>
+        <div id="LRT500"></div>
+      </article>
+      <article class="station-card lrt-card">
+        <div class="station-head"><span class="station-code green">295</span><h3>屯門站 → 屯門碼頭</h3></div>
+        <div id="LRT295"></div>
+      </article>
+      <article class="station-card lrt-card">
+        <div class="station-head"><span class="station-code green">240</span><h3>兆禧 → 屯門站</h3></div>
+        <div id="LRT240"></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="voice-panel panel">
+    <div class="panel-head">
+      <div><h2>🔊 智能語音報告</h2><p>交通＋天氣自動播報</p></div>
+      <div class="update-badge" id="voice-state">未啟動</div>
+    </div>
+    <div class="voice-controls">
+      <label>聲線
+        <select id="voice-gender">
+          <option value="female" selected>👩 女聲</option>
+          <option value="male">👨 男聲</option>
+          <option value="auto">🤖 自動最佳中文聲線</option>
+        </select>
+      </label>
+      <label>報告頻率
+        <select id="voice-interval">
+          <option value="5">每 5 分鐘</option>
+          <option value="10" selected>每 10 分鐘</option>
+          <option value="15">每 15 分鐘</option>
+          <option value="30">每 30 分鐘</option>
+        </select>
+      </label>
+      <button id="voice-now" class="voice-now" type="button">🔊 立即報告一次</button>
+    </div>
+    <div class="voice-hint">💡 男／女聲會按你裝置提供的中文語音挑選；不同手機、瀏覽器可用聲線不同。</div>
+    <div id="voice-preview" class="voice-preview">按「開始語音報告」後，系統會用裝置的廣東話／中文語音讀出交通及天氣摘要。</div>
+  </section>
+
+  <section class="map-panel panel">
+    <div class="panel-head">
+      <div><h2>🗺️ 香港交通 LIVE 中心</h2><p>主要道路・官方交通資料入口</p></div>
+      <a class="official-btn" href="https://tc-traffic.td.gov.hk/tc/traffic-information" target="_blank" rel="noopener">開啟官方交通地圖 ↗</a>
+    </div>
+    <div class="road-grid">
+      <div class="road-card"><span>🚗 屯門公路</span><b id="road-tuenmun">待更新</b></div>
+      <div class="road-card"><span>🚗 元朗公路</span><b id="road-yuenlong">待更新</b></div>
+      <div class="road-card"><span>🚗 青山公路</span><b id="road-castlepeak">待更新</b></div>
+      <div class="road-card"><span>🚗 大欖隧道</span><b id="road-taiflam">待更新</b></div>
+    </div>
+    <div class="map-note">交通速度資料由運輸署開放數據提供，現時官方「行車速度圖」第二代資料每 5 分鐘更新；這個畫面同時提供官方 HKeMobility 地圖入口。</div>
+  </section>
+
+  <section class="lower-grid">
+    <section class="panel traffic-panel">
+      <div class="panel-head">
+        <div><h2>🚨 最新交通消息</h2><p>運輸署即時消息</p></div>
+        <div class="update-badge" id="traffic-update">--</div>
+      </div>
+      <div id="traffic-news" class="news-list">
+        <div class="loading">載入中…</div>
+      </div>
+    </section>
+
+    <section class="panel info-panel">
+      <div class="panel-head">
+        <div><h2>📍 屯門・元朗焦點</h2><p>方便返工出行</p></div>
+      </div>
+      <div class="focus-card">
+        <div class="focus-icon">🚆</div>
+        <div><b>屯馬綫</b><span id="focus-rail">正常</span></div>
+      </div>
+      <div class="focus-card">
+        <div class="focus-icon">🚊</div>
+        <div><b>輕鐵</b><span>實時 ETA</span></div>
+      </div>
+      <div class="focus-card">
+        <div class="focus-icon">🚦</div>
+        <div><b>道路</b><span id="focus-road">檢查中</span></div>
+      </div>
+      <div class="focus-card">
+        <div class="focus-icon">🌦️</div>
+        <div><b>天氣</b><span id="focus-weather">檢查中</span></div>
+      </div>
+    </section>
+  </section>
+
+  <section class="ticker">
+    <div class="ticker-label">📢 LIVE</div>
+    <div id="ticker-text">香港交通 SUPER SCREEN 正在啟動…</div>
+  </section>
+</main>
+
+<footer>
+  <span>資料：MTR / 香港天文台 / 香港運輸署</span>
+  <span>最後更新：<b id="last-update">--</b></span>
+</footer>
+
+<script src="app.js?v=1"></script>
+</body>
+</html>

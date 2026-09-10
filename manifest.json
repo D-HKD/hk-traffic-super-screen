@@ -1,0 +1,9 @@
+{
+  "name": "香港交通 SUPER SCREEN",
+  "short_name": "HK Traffic",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#07182e",
+  "theme_color": "#07182e",
+  "lang": "zh-Hant"
+}
