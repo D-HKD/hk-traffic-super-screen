@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="香港交通警報中心">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a1d30"/>
+      <stop offset="1" stop-color="#040b14"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#32dcff"/>
+      <stop offset="1" stop-color="#b18cff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect x="16" y="16" width="480" height="480" rx="100" fill="none" stroke="#1b6d92" stroke-width="3"/>
+  <path d="M256 108 L292 220 L404 256 L292 292 L256 404 L220 292 L108 256 L220 220 Z" fill="url(#mark)"/>
+  <circle cx="256" cy="256" r="26" fill="#040b14"/>
+  <circle cx="256" cy="256" r="14" fill="#32dcff"/>
+</svg>
