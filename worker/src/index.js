@@ -470,6 +470,10 @@ export default {
 
   /** Cron Trigger：每 5 分鐘檢查一次新交通消息並推送。 */
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(runPushJob(env));
+    ctx.waitUntil(
+      runPushJob(env)
+        .then((result) => console.log('[push]', JSON.stringify(result)))
+        .catch((error) => console.error('[push] 失敗', String(error && error.message ? error.message : error))),
+    );
   },
 };
