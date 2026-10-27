@@ -1,6 +1,7 @@
 {
   "name": "hk-traffic-rewrite",
   "private": true,
+  "packageManager": "pnpm@11.28.5",
   "version": "2.0.0",
   "type": "module",
   "description": "香港交通警報中心 v2 — 可追溯資料版（屯門・元朗・天水圍）",
