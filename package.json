@@ -11,7 +11,6 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "node --test",
-    "deploy": "node tools/deploy-gh-pages.mjs",
     "deploy:docs": "node tools/deploy-docs.mjs",
     "check": "npm run typecheck && npm run test && vite build"
   },
