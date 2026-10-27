@@ -218,7 +218,16 @@ async function togglePush(): Promise<void> {
     return;
   }
 
-  const next = await subscribePush();
+  let next: Awaited<ReturnType<typeof subscribePush>>;
+  try {
+    next = await subscribePush();
+  } catch (error) {
+    const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    console.error('[push] 訂閱失敗', error);
+    chrome?.setNotify('off');
+    chrome?.toast('推送訂閱失敗', detail);
+    return;
+  }
   chrome?.setNotify(next === 'subscribed' ? 'on' : 'off');
   chrome?.toast(
     next === 'subscribed' ? '已開啟交通推送' : '未能開啟推送',
