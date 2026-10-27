@@ -352,6 +352,33 @@ async function handlePushTest(url, request, env) {
   }
   return json({ ok: true, sent: results.length, results }, 200, request, env);
 }
+/**
+ * 新大嶼山巴士（NLB）到站：B2／B2P 等口岸線。
+ * 官方端點：rt.data.gov.hk/v2/transport/nlb/stop.php?action=estimatedArrivals
+ */
+async function handleNlb(url, request, env, ctx) {
+  const routeId = (url.searchParams.get('route') || '').replace(/\D/g, '');
+  const stopId = (url.searchParams.get('stop') || '').replace(/\D/g, '');
+  if (!routeId || !stopId) {
+    return json({ ok: false, error: '需要 route 及 stop 參數' }, 400, request, env);
+  }
+  const target = `https://rt.data.gov.hk/v2/transport/nlb/stop.php?action=estimatedArrivals&routeId=${routeId}&stopId=${stopId}&language=zh`;
+  const cacheKey = `${url.origin}/api/nlb?route=${routeId}&stop=${stopId}`;
+  return edgeCached(request, cacheKey, TTL.bus, ctx, async () => {
+    const upstream = await fetch(target, { headers: { 'User-Agent': 'hk-traffic-super-screen/2.5' } });
+    if (!upstream.ok) {
+      return json({ ok: false, error: `NLB ${upstream.status}` }, 502, request, env);
+    }
+    const body = await upstream.text();
+    let data;
+    try {
+      data = JSON.parse(body);
+    } catch {
+      return json({ ok: false, error: 'NLB 回應格式錯誤' }, 502, request, env);
+    }
+    return json({ ok: true, arrivals: data.estimatedArrivals ?? [] }, 200, request, env, TTL.bus);
+  });
+}
 /** 極簡 XML 取值（Worker 冇 DOMParser）。 */
 function pickTag(block, tag) {
   const match = new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`).exec(block);
@@ -476,7 +503,8 @@ export default {
           return json({ ok: true, now: new Date().toISOString() }, 200, request, env);
         case '/api/rail':
           return await handleRail(url, request, env, ctx);
-        case '/api/bus':
+        case '/api/nlb':
+          return await handleNlb(url, request, env, ctx);        case '/api/bus':
           return await handleBus(url, request, env, ctx);
         case '/api/bus/stops':
           return await edgeCached(request, `${url.origin}/api/bus/stops`, TTL.info, ctx, async () =>

@@ -124,11 +124,18 @@ export interface UiState {
   readonly busStop: string;
 }
 
+export interface NlbArrival {
+  readonly route: string;
+  readonly dest: string;
+  readonly minutes: number;
+}
+
 export interface AppState {
   readonly conn: ConnState;
   readonly tml: Slice<Readonly<Partial<Record<string, StationArrivals>>>>;
   readonly lrt: Slice<readonly LrtRow[]>;
   readonly bus: Slice<readonly BusArrival[]>;
+  readonly nlb: Slice<readonly NlbArrival[]>;
   readonly roads: Slice<RoadSnapshot>;
   readonly weather: Slice<WeatherReading>;
   readonly traffic: Slice<readonly TrafficItem[]>;

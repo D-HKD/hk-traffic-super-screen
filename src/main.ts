@@ -3,6 +3,7 @@ import './styles/extra.css';
 
 import { errorMessage } from './api/client';
 import { fetchBusArrivals, loadBusStops, type BusStopRef } from './api/bus';
+import { fetchNlbArrivals } from './api/nlb';
 import { fetchLrtStations } from './api/lrt';
 import { PartialFailureError, TML_CODES, fetchTmlBatch } from './api/mtr';
 import { fetchTrafficNews } from './api/traffic';
@@ -85,6 +86,7 @@ const store = createStore<AppState>({
   tml: idleSlice(),
   lrt: idleSlice(),
   bus: idleSlice(),
+  nlb: idleSlice(),
   roads: idleSlice(),
   weather: idleSlice(),
   traffic: idleSlice(),
@@ -400,6 +402,20 @@ function startJobs(sched: Scheduler): void {
     },
   });
 
+  sched.add({
+    name: 'nlb',
+    everyMs: 60_000,
+    async run(signal) {
+      store.update({ nlb: beginLoad(store.get().nlb) });
+      const started = performance.now();
+      try {
+        const rows = await fetchNlbArrivals(new Date(), { signal });
+        store.update({ nlb: succeed(rows, performance.now() - started) });
+      } catch (error) {
+        store.update({ nlb: failed(store.get().nlb, errorMessage(error)) });
+      }
+    },
+  });
   sched.add({
     name: 'roads',
     everyMs: REFRESH_MS.roads,
