@@ -318,6 +318,39 @@ async function handlePushUnsubscribe(request, env) {
   return json({ ok: true }, 200, request, env);
 }
 
+/** ⚠️ 臨時：發送一則測試推送（用完即刪）。 */
+async function handlePushTest(url, request, env) {
+  const TOKEN = 'ec2b04d76513';
+  if ((url.searchParams.get('token') || '') !== TOKEN) {
+    return json({ ok: false, error: 'forbidden' }, 403, request, env);
+  }
+  const config = pushConfig(env);
+  const store = env && env.SUBSCRIPTIONS;
+  if (!config || !store) return json({ ok: false, error: '推送未設定' }, 503, request, env);
+
+  const payload = {
+    title: '測試警報｜香港交通警報中心',
+    body: '呢條係測試推送，證明背景通知已接通。之後只會推送真正嘅屯元天交通消息。',
+    url: './#alerts',
+    tag: `test-${Date.now()}`,
+  };
+
+  const list = await store.list({ prefix: 'sub:' });
+  const results = [];
+  for (const key of list.keys) {
+    const record = await store.get(key.name);
+    if (!record) continue;
+    try {
+      const subscription = JSON.parse(record);
+      const response = await sendPush(subscription, payload, config);
+      results.push({ host: new URL(subscription.endpoint).host, status: response.status, ok: response.ok });
+      if (response.status === 404 || response.status === 410) await store.delete(key.name);
+    } catch (error) {
+      results.push({ host: '?', ok: false, error: String(error && error.message ? error.message : error) });
+    }
+  }
+  return json({ ok: true, sent: results.length, results }, 200, request, env);
+}
 /** 極簡 XML 取值（Worker 冇 DOMParser）。 */
 function pickTag(block, tag) {
   const match = new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`).exec(block);

@@ -255,3 +255,21 @@
 .bus-group-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:9px 0 2px}
 .bus-group-head b{font-size:11px;color:var(--cyan);font-weight:600;letter-spacing:.02em}
 .bus-group-head span{font-size:9px;color:var(--muted);white-space:nowrap}
+
+/* 修正：base.css 在 ≤1100px 把第一個 icon-btn（＝GPS ⌖）設 display:none，
+   但位置欄仍然叫用戶「按右上角 ⌖」。呢個覆寫令佢在所有寬度都顯示。 */
+@media (max-width:1100px){
+  .top-actions .icon-btn:nth-child(1){display:grid;place-items:center}
+}
+
+/* 手機版 header：三個 icon 掣要放得落，品牌要可以縮 */
+@media (max-width:700px){
+  .top{grid-template-columns:minmax(0,1fr) auto}
+  .brand{min-width:0}
+  .brand>div{min-width:0;overflow:hidden}
+  .brand h1{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brand p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brand small{display:none}
+  .top-actions{gap:5px}
+  .top-actions .icon-btn{min-width:32px;height:32px;font-size:14px;padding:0}
+}
