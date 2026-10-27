@@ -188,19 +188,20 @@ VITE_PROXY_BASE=https://<你的-worker>.workers.dev
 
 ## 部署
 
-### 前端（GitHub Pages）
+### 部署網站（GitHub Pages，由 `main` 的 `/docs` 提供）
 
-專案已附 `.github/workflows/pages.yml`：push 到 `main` 會自動 `pnpm check`（型別 + 測試 + build）再部署 `dist/`。
+本 repo 的 Pages 設定係 **Branch = `main`、Folder = `/docs`**。`docs/` 入面就係 build 出嚟的靜態檔（連 `.nojekyll`）。
 
-**第一次啟用（只做一次）：**
+更新流程：
 
-1. repo → Settings → Pages → **Source** 揀「GitHub Actions」
-2. push 到 `main`（或手動 run workflow）
+```bash
+pnpm check        # 型別 + 53 個測試 + build
+pnpm deploy:docs  # build → 複製到 docs/ → commit → push main
+```
 
-> ⚠️ 如果 Pages 仍然設成「Deploy from a branch」，佢會直接出 repo 根目錄的 `index.html`——嗰個係 Vite 的入口檔，未 build 過，開出嚟會白畫面。所以一定要先轉去 GitHub Actions。
+約一分鐘後就會反映到 https://d-hkd.github.io/hk-traffic-super-screen/ 。
 
-`vite.config.ts` 用 `base: './'`，所以同一個 `dist/` 也可以放 Cloudflare Pages 或任何靜態空間。
-
+> 為什麼唔用 GitHub Actions？呢個 repo 的 Pages「Source」選單冇提供「GitHub Actions」選項（只有 branch）。用 branch + `/docs` 效果一樣，亦唔需要 Actions 權限；代價係要手動跑一次 `pnpm deploy:docs`。
 ### Worker（部署 + 開推送）
 
 需要 Cloudflare 帳號（免費方案已夠）。全部指令在 `worker/` 目錄執行。

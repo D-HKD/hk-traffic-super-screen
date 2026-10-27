@@ -1,7 +1,7 @@
 import type { AppState, Arrival, LrtRow, Slice, StationArrivals } from '../api/types';
 import { TML_STATIONS } from '../api/mtr';
 import { LRT_GROUPS } from '../api/lrt';
-import { byId, h, replace, setText } from '../lib/dom';
+import { byId, h, on, replace, setText } from '../lib/dom';
 import { agoText, etaText, freshness } from '../lib/format';
 import { lrtCarsIcon } from './rail-art';
 
@@ -109,6 +109,7 @@ function lrtTab(tab: StationTab, rows: readonly LrtRow[], selected: boolean, han
     'button',
     {
       class: 'lrt-tab',
+      id: `lrt-tab-${tab.code}`,
       type: 'button',
       role: 'tab',
       aria: {
@@ -154,10 +155,21 @@ function renderLrt(slice: Slice<readonly LrtRow[]>, selected: string, handlers: 
   const tabs: readonly StationTab[] = LRT_GROUPS.map((group) => ({ code: group.station, name: group.name }));
   const active = tabs.find((tab) => tab.code === selected)?.code ?? tabs[0]?.code ?? '500';
 
-  replace(
-    byId('lrt-tabs'),
-    ...tabs.map((tab) => lrtTab(tab, rows, tab.code === active, handlers)),
-  );
+  // 鍵盤：ArrowLeft / ArrowRight 切換站，並保留焦點（roving tabindex）。
+  const tabButtons = tabs.map((tab) => lrtTab(tab, rows, tab.code === active, handlers));
+  tabButtons.forEach((button, index) => {
+    button.tabIndex = tabs[index]?.code === active ? 0 : -1;
+    on(button, 'keydown', (event) => {
+      if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+      event.preventDefault();
+      const delta = event.key === 'ArrowRight' ? 1 : -1;
+      const next = tabs[(index + delta + tabs.length) % tabs.length];
+      if (!next) return;
+      handlers.selectLrtStation(next.code);
+      window.setTimeout(() => document.getElementById(`lrt-tab-${next.code}`)?.focus(), 0);
+    });
+  });
+  replace(byId('lrt-tabs'), ...tabButtons);
 
   const main = byId('LRT-eta');
   const own = stationRows(rows, active);
