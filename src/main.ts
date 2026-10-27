@@ -3,7 +3,7 @@ import './styles/extra.css';
 
 import { errorMessage } from './api/client';
 import { fetchBusArrivals } from './api/bus';
-import { fetchLrtBatch } from './api/lrt';
+import { fetchLrtStations } from './api/lrt';
 import { PartialFailureError, TML_CODES, fetchTmlBatch } from './api/mtr';
 import { fetchTrafficNews } from './api/traffic';
 import { idleSlice, type AlertFilter, type AppState, type ConnState, type Slice, type TrafficItem } from './api/types';
@@ -21,6 +21,7 @@ import { showAdviceDetail } from './ui/advice';
 import { renderApp } from './ui/app';
 import { initChrome, type Chrome, type ModalBlock } from './ui/chrome';
 import { mapsUrl } from './ui/location';
+import { initLrtPicker } from './ui/rail';
 import { busIcon, railStrip, trainIcon, tramIcon } from './ui/rail-art';
 import { registerServiceWorker } from './pwa';
 
@@ -249,9 +250,10 @@ function selectLrtStation(code: string, announce = false): void {
   const state = store.get();
   if (state.ui.lrtStation === code) return;
   // 巴士面板跟隨選中嘅站，所以要清掉舊站資料，避免短暫顯示錯站班次。
-  store.update({ ui: { ...state.ui, lrtStation: code }, bus: idleSlice() });
+  store.update({ ui: { ...state.ui, lrtStation: code }, bus: idleSlice(), lrt: idleSlice() });
   savePrefs(store.get());
   scheduler?.refresh('bus');
+  scheduler?.refresh('lrt');
   if (announce) chrome?.toast('已切換車站', `${stationName(code)}站（巴士同步更新）`);
 }
 
@@ -357,7 +359,7 @@ function startJobs(sched: Scheduler): void {
       store.update({ lrt: beginLoad(store.get().lrt) });
       const started = performance.now();
       try {
-        const rows = await fetchLrtBatch({ signal });
+        const rows = await fetchLrtStations([store.get().ui.lrtStation], { signal });
         store.update({ lrt: succeed(rows, performance.now() - started) });
       } catch (error) {
         store.update({ lrt: failed(store.get().lrt, errorMessage(error)) });
@@ -489,6 +491,7 @@ byId('bus-art').append(busIcon());
 byId('tml-strip').append(railStrip());
 
 bindActions();
+initLrtPicker({ selectLrtStation });
 chrome.setNight(prefs.night);
 
 void currentPushState().then((state) => {

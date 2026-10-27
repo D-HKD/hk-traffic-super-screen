@@ -24,6 +24,7 @@ export function haversineKm(a: GeoPoint, b: GeoPoint): number {
 export interface LrtStation {
   readonly code: string;
   readonly name: string;
+  readonly area: string;
   readonly lat: number;
   readonly lon: number;
 }
@@ -31,6 +32,7 @@ export interface LrtStation {
 export const LRT_STATIONS: readonly LrtStation[] = LRT_GROUPS.map((group) => ({
   code: group.station,
   name: group.name,
+  area: group.area,
   lat: group.lat,
   lon: group.lon,
 }));

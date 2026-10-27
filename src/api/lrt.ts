@@ -58,9 +58,16 @@ export function parseLrtSchedule(payload: unknown, group: (typeof LRT_GROUPS)[nu
   return deduped;
 }
 
-export async function fetchLrtBatch(options: RequestOptions): Promise<LrtRow[]> {
+/**
+ * 只抓指定車站（68 個站全抓會變成每 30 秒 68 個請求，絕對唔可以）。
+ * 呼叫方傳入「目前選中」嘅站號（通常 1 個）。
+ */
+export async function fetchLrtStations(codes: readonly string[], options: RequestOptions): Promise<LrtRow[]> {
+  const groups = LRT_GROUPS.filter((group) => codes.includes(group.station));
+  if (groups.length === 0) return [];
+
   const results = await Promise.allSettled(
-    LRT_GROUPS.map(async (group) => {
+    groups.map(async (group) => {
       const target = `https://rt.data.gov.hk/v1/transport/mtr/lrt/getSchedule?station_id=${group.station}&with_special=1`;
       return getJson('/mtr', { url: target }, (raw) => parseLrtSchedule(raw, group), options);
     }),
@@ -72,7 +79,7 @@ export async function fetchLrtBatch(options: RequestOptions): Promise<LrtRow[]> 
     if (result.status === 'fulfilled') rows.push(...result.value);
     else failures += 1;
   }
-  if (rows.length === 0 && failures > 0) throw new Error('輕鐵三個站都取不到');
+  if (rows.length === 0 && failures > 0) throw new Error('輕鐵班次暫時取不到');
   rows.sort((a, b) => a.minutes - b.minutes);
   return rows.slice(0, MAX_ROWS);
 }

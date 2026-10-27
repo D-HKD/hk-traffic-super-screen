@@ -284,3 +284,11 @@
   .lrt-tabs::-webkit-scrollbar{display:none}
   .lrt-tab{flex:0 0 76px}
 }
+
+/* 68 站：分區下拉 */
+.lrt-picker{display:flex;align-items:center;gap:8px;padding:0 12px 10px}
+.lrt-picker label{font-size:9px;letter-spacing:.08em;color:var(--muted);white-space:nowrap}
+.lrt-picker select{flex:1;min-width:0;background:#0a2740;color:var(--text);border:1px solid rgba(50,220,255,.32);
+  border-radius:10px;padding:9px 10px;font-size:12px;font-family:inherit;cursor:pointer}
+.lrt-picker select:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
+.lrt-hint{font-size:9px;color:var(--muted);white-space:nowrap}

@@ -1,7 +1,7 @@
 import type { AppState, Arrival, LrtRow, Slice, StationArrivals } from '../api/types';
 import { TML_STATIONS } from '../api/mtr';
-import { LRT_GROUPS } from '../api/lrt';
 import { byId, h, on, replace, setText } from '../lib/dom';
+import { LRT_STATIONS, haversineKm } from '../core/places';
 import { agoText, etaText, freshness } from '../lib/format';
 import { lrtCarsIcon } from './rail-art';
 
@@ -92,37 +92,6 @@ function stationRows(rows: readonly LrtRow[], stationCode: string): LrtRow[] {
   return rows.filter((row) => row.station === stationCode).sort((a, b) => a.minutes - b.minutes);
 }
 
-function nextMinutes(rows: readonly LrtRow[], stationCode: string): number | null {
-  const own = stationRows(rows, stationCode);
-  return own.length > 0 && own[0] ? own[0].minutes : null;
-}
-
-interface StationTab {
-  readonly code: string;
-  readonly name: string;
-}
-
-function lrtTab(tab: StationTab, rows: readonly LrtRow[], selected: boolean, handlers: RailHandlers): HTMLElement {
-  const next = nextMinutes(rows, tab.code);
-  const nextText = next === null ? '—' : next <= 1 ? '即將' : `${next} 分`;
-  return h(
-    'button',
-    {
-      class: 'lrt-tab',
-      id: `lrt-tab-${tab.code}`,
-      type: 'button',
-      role: 'tab',
-      aria: {
-        selected: String(selected),
-        label: `${tab.name}，${next === null ? '暫無班次' : `下一班 ${next} 分鐘`}`,
-      },
-      on: { click: () => handlers.selectLrtStation(tab.code) },
-    },
-    h('span', { class: 'lrt-tab-name', text: tab.name }),
-    h('small', { class: next !== null && next <= 1 ? 'soon' : undefined, text: nextText }),
-  );
-}
-
 function lrtRow(row: LrtRow): HTMLElement {
   const eta = etaText(row.minutes);
   const hue = routeHue(row.route);
@@ -134,12 +103,7 @@ function lrtRow(row: LrtRow): HTMLElement {
       'div',
       { class: 'lrt-info' },
       h('b', { text: `往${row.dest}` }),
-      h(
-        'small',
-        {},
-        row.platform ? `月台 ${row.platform}` : '月台不詳',
-        row.cars ? lrtCarsIcon(row.cars, hue) : null,
-      ),
+      h('small', {}, row.platform ? `月台 ${row.platform}` : '月台不詳', row.cars ? lrtCarsIcon(row.cars, hue) : null),
     ),
     h(
       'strong',
@@ -150,31 +114,44 @@ function lrtRow(row: LrtRow): HTMLElement {
   );
 }
 
+/**
+ * 68 個輕鐵站不可能用 tab；改成按區分組的下拉選單（只建立一次）。
+ */
+export function initLrtPicker(handlers: RailHandlers): void {
+  const select = byId<HTMLSelectElement>('lrt-station');
+  if (select.options.length > 0) return;
+
+  for (const area of ['屯門', '天水圍', '元朗']) {
+    const group = document.createElement('optgroup');
+    group.label = area;
+    const inArea = LRT_STATIONS.filter((station) => station.area === area).sort((a, b) =>
+      a.name.localeCompare(b.name, 'zh-Hant'),
+    );
+    for (const station of inArea) {
+      const option = document.createElement('option');
+      option.value = station.code;
+      option.textContent = station.name;
+      group.appendChild(option);
+    }
+    select.appendChild(group);
+  }
+
+  on(select, 'change', () => handlers.selectLrtStation(select.value));
+}
+
 function renderLrt(slice: Slice<readonly LrtRow[]>, selected: string, handlers: RailHandlers): void {
   const rows = slice.data ?? [];
-  const tabs: readonly StationTab[] = LRT_GROUPS.map((group) => ({ code: group.station, name: group.name }));
-  const active = tabs.find((tab) => tab.code === selected)?.code ?? tabs[0]?.code ?? '500';
+  const known = LRT_STATIONS.find((station) => station.code === selected);
+  const active = known ?? LRT_STATIONS[0];
 
-  // 鍵盤：ArrowLeft / ArrowRight 切換站，並保留焦點（roving tabindex）。
-  const tabButtons = tabs.map((tab) => lrtTab(tab, rows, tab.code === active, handlers));
-  tabButtons.forEach((button, index) => {
-    button.tabIndex = tabs[index]?.code === active ? 0 : -1;
-    on(button, 'keydown', (event) => {
-      if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
-      event.preventDefault();
-      const delta = event.key === 'ArrowRight' ? 1 : -1;
-      const next = tabs[(index + delta + tabs.length) % tabs.length];
-      if (!next) return;
-      handlers.selectLrtStation(next.code);
-      window.setTimeout(() => document.getElementById(`lrt-tab-${next.code}`)?.focus(), 0);
-    });
-  });
-  replace(byId('lrt-tabs'), ...tabButtons);
+  const select = document.getElementById('lrt-station') as HTMLSelectElement | null;
+  if (select && active && select.value !== active.code) select.value = active.code;
+
+  const activeCode = active?.code ?? '';
+  const own = stationRows(rows, activeCode);
+  const activeName = active?.name ?? activeCode;
 
   const main = byId('LRT-eta');
-  const own = stationRows(rows, active);
-  const activeName = tabs.find((tab) => tab.code === active)?.name ?? active;
-
   if (!slice.data) {
     if (slice.state === 'error') {
       replace(main, h('div', { class: 'state-error', text: slice.error ?? '暫時取不到輕鐵班次' }));
@@ -191,26 +168,31 @@ function renderLrt(slice: Slice<readonly LrtRow[]>, selected: string, handlers: 
     replace(main, ...own.slice(0, LRT_MAX_ROWS).map(lrtRow));
   }
 
-  const others = tabs.filter((tab) => tab.code !== active);
+  // 「附近站」：用座標找最近 2 個其他站，方便一按跳過去。
+  const nearby = active
+    ? LRT_STATIONS.filter((station) => station.code !== active.code)
+        .map((station) => ({ station, km: haversineKm(active, station) }))
+        .sort((a, b) => a.km - b.km)
+        .slice(0, 2)
+    : [];
+
   replace(
     byId('lrt-others'),
-    ...others.map((tab) => {
-      const next = nextMinutes(rows, tab.code);
-      return h(
+    ...nearby.map(({ station, km }) =>
+      h(
         'button',
         {
           class: 'lrt-other',
           type: 'button',
-          aria: { label: `切換到${tab.name}站` },
-          on: { click: () => handlers.selectLrtStation(tab.code) },
+          aria: { label: `切換到${station.name}站，距離 ${km.toFixed(1)} 公里` },
+          on: { click: () => handlers.selectLrtStation(station.code) },
         },
-        h('b', { text: tab.name }),
-        h('span', { class: next !== null && next <= 1 ? 'soon' : undefined, text: next === null ? '—' : next <= 1 ? '即將' : `${next} 分` }),
-      );
-    }),
+        h('b', { text: station.name }),
+        h('span', { text: km < 1 ? `${Math.round(km * 1000)} 米` : `${km.toFixed(1)} 公里` }),
+      ),
+    ),
   );
 }
-
 /* ------------------------------------------------------------------ 入口 */
 
 function tmlStationRow(station: { readonly code: string; readonly name: string }, slice: TmlSlice): HTMLElement {
