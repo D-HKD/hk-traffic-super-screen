@@ -379,6 +379,31 @@ async function handleNlb(url, request, env, ctx) {
     return json({ ok: true, arrivals: data.estimatedArrivals ?? [] }, 200, request, env, TTL.bus);
   });
 }
+/**
+ * 城巴（CTB）到站：屯門／深圳灣口岸的 B3 系列。
+ * 官方端點：rt.data.gov.hk/v2/transport/citybus/eta/CTB/{stop}/{route}
+ */
+async function handleCtb(url, request, env, ctx) {
+  const route = (url.searchParams.get('route') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const stop = (url.searchParams.get('stop') || '').replace(/\D/g, '');
+  if (!route || !stop) {
+    return json({ ok: false, error: '需要 route 及 stop 參數' }, 400, request, env);
+  }
+  const target = `https://rt.data.gov.hk/v2/transport/citybus/eta/CTB/${stop}/${route}`;
+  const cacheKey = `${url.origin}/api/ctb?route=${route}&stop=${stop}`;
+  return edgeCached(request, cacheKey, TTL.bus, ctx, async () => {
+    const upstream = await fetch(target, { headers: { 'User-Agent': 'hk-traffic-super-screen/2.5' } });
+    if (!upstream.ok) return json({ ok: false, error: `CTB ${upstream.status}` }, 502, request, env);
+    const body = await upstream.text();
+    let data;
+    try {
+      data = JSON.parse(body);
+    } catch {
+      return json({ ok: false, error: '城巴回應格式錯誤' }, 502, request, env);
+    }
+    return json({ ok: true, arrivals: data.data ?? [] }, 200, request, env, TTL.bus);
+  });
+}
 /** 極簡 XML 取值（Worker 冇 DOMParser）。 */
 function pickTag(block, tag) {
   const match = new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`).exec(block);
@@ -503,6 +528,8 @@ export default {
           return json({ ok: true, now: new Date().toISOString() }, 200, request, env);
         case '/api/rail':
           return await handleRail(url, request, env, ctx);
+        case '/api/ctb':
+          return await handleCtb(url, request, env, ctx);
         case '/api/nlb':
           return await handleNlb(url, request, env, ctx);        case '/api/bus':
           return await handleBus(url, request, env, ctx);

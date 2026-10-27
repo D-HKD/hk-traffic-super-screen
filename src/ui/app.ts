@@ -1,6 +1,6 @@
 import type { AppState } from '../api/types';
 import { renderAdvice } from './advice';
-import { renderBus, renderNlb } from './bus';
+import { renderBus, renderPort } from './bus';
 import { renderFavorites, type FavoritesHandlers } from './misc';
 import { renderLocation } from './location';
 import { renderMessages, renderRelevant, renderRoads } from './roads';
@@ -24,7 +24,7 @@ export function renderApp(state: AppState, handlers: AppHandlers): void {
   renderAdvice(state);
   renderRail(state, now, handlers.rail);
   renderBus(state, now);
-  renderNlb(state);
+  renderPort(state);
   renderWeather(state.weather, now);
   renderRoads(state.traffic, state.roads, now);
   renderMessages(state.traffic, state.ui.filter);

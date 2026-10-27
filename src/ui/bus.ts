@@ -1,4 +1,4 @@
-import type { AppState, NlbArrival } from '../api/types';
+import type { AppState, PortArrival } from '../api/types';
 import { loadBusStops } from '../api/bus';
 import { groupByStop } from '../core/bus';
 import { busStopsFor, stationName } from '../core/places';
@@ -75,13 +75,13 @@ export function initBusPicker(handlers: BusHandlers): void {
   on(select, 'change', () => handlers.selectBusStop(select.value));
 }
 
-function nlbRow(row: NlbArrival): HTMLElement {
+function portRow(row: PortArrival): HTMLElement {
   const eta = etaText(row.minutes);
   return h(
     'div',
     { class: 'nlb-row' },
     h('span', { class: 'bus-chip nlb-chip', text: row.route }),
-    h('div', { class: 'bus-info' }, h('b', { text: `往${row.dest}` })),
+    h('div', { class: 'bus-info' }, h('b', { text: `${row.from} → ${row.dest}` })),
     h(
       'strong',
       { class: eta.due ? 'due' : undefined },
@@ -92,25 +92,25 @@ function nlbRow(row: NlbArrival): HTMLElement {
 }
 
 /** 口岸線（B2／B2P）——與九巴分開呈現，因為營運商同資料源都唔同。 */
-export function renderNlb(state: AppState): void {
+export function renderPort(state: AppState): void {
   const block = document.getElementById('nlb-block');
   const list = byId('nlb-list');
   if (!block) return;
 
-  if (!state.nlb.data) {
-    if (state.nlb.state === 'error') {
-      replace(list, h('div', { class: 'state-empty', text: state.nlb.error ?? '口岸線資料暫時取不到' }));
+  if (!state.port.data) {
+    if (state.port.state === 'error') {
+      replace(list, h('div', { class: 'state-empty', text: state.port.error ?? '口岸線資料暫時取不到' }));
     } else {
       replace(list, h('span', { class: 'skeleton', aria: { hidden: 'true' } }));
     }
     return;
   }
 
-  if (state.nlb.data.length === 0) {
+  if (state.port.data.length === 0) {
     replace(list, h('div', { class: 'state-empty', text: '口岸線暫無即將開出班次' }));
     return;
   }
-  replace(list, ...state.nlb.data.map(nlbRow));
+  replace(list, ...state.port.data.map(portRow));
 }
 export function renderBus(state: AppState, now: Date): void {
   setText(byId('bus-badge'), badgeText(state.bus, now));

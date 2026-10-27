@@ -3,7 +3,7 @@ import './styles/extra.css';
 
 import { errorMessage } from './api/client';
 import { fetchBusArrivals, loadBusStops, type BusStopRef } from './api/bus';
-import { fetchNlbArrivals } from './api/nlb';
+import { fetchPortArrivals } from './api/port';
 import { fetchLrtStations } from './api/lrt';
 import { PartialFailureError, TML_CODES, fetchTmlBatch } from './api/mtr';
 import { fetchTrafficNews } from './api/traffic';
@@ -86,7 +86,7 @@ const store = createStore<AppState>({
   tml: idleSlice(),
   lrt: idleSlice(),
   bus: idleSlice(),
-  nlb: idleSlice(),
+  port: idleSlice(),
   roads: idleSlice(),
   weather: idleSlice(),
   traffic: idleSlice(),
@@ -403,16 +403,16 @@ function startJobs(sched: Scheduler): void {
   });
 
   sched.add({
-    name: 'nlb',
+    name: 'port',
     everyMs: 60_000,
     async run(signal) {
-      store.update({ nlb: beginLoad(store.get().nlb) });
+      store.update({ port: beginLoad(store.get().port) });
       const started = performance.now();
       try {
-        const rows = await fetchNlbArrivals(new Date(), { signal });
-        store.update({ nlb: succeed(rows, performance.now() - started) });
+        const rows = await fetchPortArrivals(new Date(), { signal });
+        store.update({ port: succeed(rows, performance.now() - started) });
       } catch (error) {
-        store.update({ nlb: failed(store.get().nlb, errorMessage(error)) });
+        store.update({ port: failed(store.get().port, errorMessage(error)) });
       }
     },
   });
