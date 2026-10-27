@@ -76,7 +76,7 @@ export const LRT_GROUPS = [
     lat: 22.3725605,
     lon: 113.9664784,
     bus: [
-      { id: '8D6792FF38584BE0', name: '屯門碼頭總站 (TM882)', meters: 25 },
+      { id: '722B3DD3D7BCFA21', name: '屯門碼頭(兆禧苑) (TM633)', meters: 64 },
       { id: 'E3E171AEDE35ACDF', name: '屯門碼頭總站 (TM882a)', meters: 25 },
     ],
   },
@@ -88,8 +88,8 @@ export const LRT_GROUPS = [
     lat: 22.375073,
     lon: 113.9611989,
     bus: [
-      { id: '015AD88813C61900', name: '美樂花園 (TM464)', meters: 52 },
-      { id: '86D1BF834F627D5C', name: '蝴蝶邨蝶心樓 (TM630)', meters: 150 },
+      { id: 'B651E2A39CD4CC05', name: '蝴蝶灣 (TM670)', meters: 213 },
+      { id: '0221966C1116C4EC', name: '蝴蝶灣 (TM437)', meters: 256 },
     ],
   },
   {
@@ -100,8 +100,8 @@ export const LRT_GROUPS = [
     lat: 22.378144,
     lon: 113.9617393,
     bus: [
-      { id: 'B88E6F52E2BC2E34', name: '蝴蝶站 (TM671)', meters: 9 },
       { id: 'F734736F35F459DC', name: '蝴蝶站 (TM672)', meters: 9 },
+      { id: '78644FF7E8B7BBA0', name: '兆山苑柳景閣 (TM436)', meters: 28 },
     ],
   },
   {
@@ -113,7 +113,7 @@ export const LRT_GROUPS = [
     lon: 113.9633725,
     bus: [
       { id: '3FAE59A79C8BCC93', name: '新屯門中心 (TM673)', meters: 4 },
-      { id: '23B913EACE0581E4', name: '新屯門中心 (TM675)', meters: 21 },
+      { id: '83A02749D0CB2EE8', name: '新屯門中心 (TM434)', meters: 50 },
     ],
   },
   {
@@ -124,8 +124,8 @@ export const LRT_GROUPS = [
     lat: 22.3852664,
     lon: 113.9650361,
     bus: [
-      { id: 'C6D5DEF91CB7B581', name: '龍門站 (TM677)', meters: 25 },
       { id: 'A1D3216AF158C117', name: '龍門站 (TM676)', meters: 40 },
+      { id: 'C6D5DEF91CB7B581', name: '龍門站 (TM677)', meters: 25 },
     ],
   },
   {
@@ -136,8 +136,8 @@ export const LRT_GROUPS = [
     lat: 22.3906423,
     lon: 113.9671443,
     bus: [
-      { id: '224B3B71A4C25C01', name: '聖彼德堂 (TM592)', meters: 167 },
       { id: '854E787D0F56BF91', name: '聖彼得堂 (TM593)', meters: 175 },
+      { id: '1F5BF0C69F30C752', name: '青雲站 (TM590)', meters: 340 },
     ],
   },
   {
@@ -148,8 +148,8 @@ export const LRT_GROUPS = [
     lat: 22.3943554,
     lon: 113.9674614,
     bus: [
-      { id: 'D010FF7CF77383B7', name: '青雲站 (TM181)', meters: 86 },
       { id: '1F5BF0C69F30C752', name: '青雲站 (TM590)', meters: 87 },
+      { id: '854E787D0F56BF91', name: '聖彼得堂 (TM593)', meters: 254 },
     ],
   },
   {
@@ -160,8 +160,8 @@ export const LRT_GROUPS = [
     lat: 22.3951744,
     lon: 113.9689004,
     bus: [
-      { id: '490F1A302D8C32FC', name: '屯門消防局 (TM600)', meters: 132 },
-      { id: 'E43D49B42EAF898B', name: '屯門消防局 ( )', meters: 132 },
+      { id: '1F5BF0C69F30C752', name: '青雲站 (TM590)', meters: 204 },
+      { id: '9E1FC92F86D2F4E3', name: '鳴琴站 (TM186)', meters: 222 },
     ],
   },
   {
@@ -172,8 +172,8 @@ export const LRT_GROUPS = [
     lat: 22.3971066,
     lon: 113.9730527,
     bus: [
-      { id: '450240CAB4788D47', name: 'V CITY, 仁政街 (TM172)', meters: 178 },
-      { id: 'C18A68BBD21DC5A6', name: 'V CITY, 仁政街 (TM173)', meters: 178 },
+      { id: '79D68EE7C6CBAB9D', name: '屯門站總站 (TM954)', meters: 237 },
+      { id: 'D74B67D55C63895F', name: '屯門站總站 (TM953)', meters: 240 },
     ],
   },
   {
@@ -184,8 +184,8 @@ export const LRT_GROUPS = [
     lat: 22.4000751,
     lon: 113.9743456,
     bus: [
-      { id: 'B3B160F8F8017035', name: '翠林花園 (TM570)', meters: 254 },
-      { id: '9E10C87488BC7493', name: '翠林花園 (TM571)', meters: 254 },
+      { id: 'BC301D7E7F063331', name: '新墟街市 (TM132)', meters: 262 },
+      { id: 'EB64718829DFC071', name: '台山小學 (TM472)', meters: 293 },
     ],
   },
   {
@@ -196,8 +196,8 @@ export const LRT_GROUPS = [
     lat: 22.4035304,
     lon: 113.9758783,
     bus: [
-      { id: 'D9B82EE66AFF2975', name: '紅橋 (TM134)', meters: 170 },
       { id: 'CBE54DB551C24A02', name: '紅橋 (TM133)', meters: 179 },
+      { id: 'D9B82EE66AFF2975', name: '紅橋 (TM134)', meters: 170 },
     ],
   },
   {
@@ -208,8 +208,8 @@ export const LRT_GROUPS = [
     lat: 22.4078234,
     lon: 113.9771509,
     bus: [
-      { id: 'A8B141D2ED68F7E1', name: '屯門醫院(鳳地站) (TM247)', meters: 162 },
       { id: '0FB4AEA370913FD2', name: '屯門醫院(鳳地站) (TM248)', meters: 176 },
+      { id: 'F224A907BD68406A', name: '兆康苑兆賢閣 (TM530)', meters: 268 },
     ],
   },
   {
@@ -220,8 +220,8 @@ export const LRT_GROUPS = [
     lat: 22.4120102,
     lon: 113.9782711,
     bus: [
+      { id: '12CF2025741EF844', name: '麒麟圍 (TM485)', meters: 233 },
       { id: '50DC968C90CE7CF4', name: '兆康站(南) (TM910)', meters: 184 },
-      { id: '0F35C99BABE4D40E', name: '兆康站(南) (TM911)', meters: 184 },
     ],
   },
   {
@@ -233,7 +233,7 @@ export const LRT_GROUPS = [
     lon: 113.9764566,
     bus: [
       { id: '12CF2025741EF844', name: '麒麟圍 (TM485)', meters: 3 },
-      { id: '7E63082F897024A3', name: '麒麟圍 (TM486)', meters: 42 },
+      { id: 'F224A907BD68406A', name: '兆康苑兆賢閣 (TM530)', meters: 61 },
     ],
   },
   {
@@ -244,8 +244,8 @@ export const LRT_GROUPS = [
     lat: 22.4073257,
     lon: 113.972571,
     bus: [
-      { id: '0C677A6B6266DB52', name: '建生邨 (TM477)', meters: 141 },
-      { id: '5AB4B6D054B4B8D3', name: '青松觀 (TM552)', meters: 142 },
+      { id: 'EDF4C2EAFDBD4693', name: '大興警署 (TM550)', meters: 212 },
+      { id: '629D4E7DD9EF1AC6', name: '大興體育館 (TM554)', meters: 355 },
     ],
   },
   {
@@ -256,8 +256,8 @@ export const LRT_GROUPS = [
     lat: 22.4067647,
     lon: 113.9691969,
     bus: [
-      { id: '274BF3A877FB8E6C', name: '建生總站 (TM931)', meters: 93 },
-      { id: '969973D9D60AA02B', name: '建生總站 (TM932)', meters: 94 },
+      { id: 'ECE3F3BE270C27E2', name: '寶怡花園 (TM478)', meters: 182 },
+      { id: 'EDF4C2EAFDBD4693', name: '大興警署 (TM550)', meters: 187 },
     ],
   },
   {
@@ -268,8 +268,8 @@ export const LRT_GROUPS = [
     lat: 22.4077765,
     lon: 113.9663998,
     bus: [
-      { id: 'F8FE29B1FAF8BA77', name: '兆邦苑 (TM383)', meters: 76 },
       { id: '840532B7C95DF870', name: '兆邦苑 (TM382)', meters: 83 },
+      { id: '594A765BE3A43C73', name: '寶田轉車站 - 盈豐園 (TM580)', meters: 91 },
     ],
   },
   {
@@ -280,8 +280,8 @@ export const LRT_GROUPS = [
     lat: 22.4066682,
     lon: 113.9635777,
     bus: [
-      { id: '692B63F1A1F42D8C', name: '良景邨總站 (TM938)', meters: 39 },
-      { id: '7C2F503A3743D32D', name: '良景邨總站 (TM937)', meters: 46 },
+      { id: '542CC0EC83BAEA01', name: '新圍苑 (TM380)', meters: 156 },
+      { id: 'BA72A994EEF9FABE', name: '新圍苑 (TM381)', meters: 160 },
     ],
   },
   {
@@ -292,8 +292,8 @@ export const LRT_GROUPS = [
     lat: 22.4052485,
     lon: 113.9644776,
     bus: [
-      { id: 'BA72A994EEF9FABE', name: '新圍苑 (TM381)', meters: 30 },
-      { id: 'DF0B7A18D4F2B7C8', name: '田景邨田裕樓 (TM542)', meters: 30 },
+      { id: '1F6BFDF34BABCE6A', name: '田景邨田裕樓 (TM540)', meters: 35 },
+      { id: '542CC0EC83BAEA01', name: '新圍苑 (TM380)', meters: 37 },
     ],
   },
   {
@@ -304,8 +304,8 @@ export const LRT_GROUPS = [
     lat: 22.401419,
     lon: 113.9677604,
     bus: [
+      { id: '6AE148CA74FC4D53', name: '大興街 (TM572)', meters: 91 },
       { id: 'C192BEF2264E0CC6', name: '石排站 (TM188)', meters: 56 },
-      { id: 'FB46A4053B38C81D', name: '石排站 (TM187)', meters: 69 },
     ],
   },
   {
@@ -316,8 +316,8 @@ export const LRT_GROUPS = [
     lat: 22.3984818,
     lon: 113.9666501,
     bus: [
+      { id: '6AE148CA74FC4D53', name: '大興街 (TM572)', meters: 307 },
       { id: 'B3CCA98CC6CE7C8C', name: '鳴琴站 (TM585)', meters: 177 },
-      { id: 'F4D9335688592803', name: '鳴琴站 (TM185)', meters: 216 },
     ],
   },
   {
@@ -329,7 +329,7 @@ export const LRT_GROUPS = [
     lon: 113.9660529,
     bus: [
       { id: 'F4D9335688592803', name: '鳴琴站 (TM185)', meters: 135 },
-      { id: '9E1FC92F86D2F4E3', name: '鳴琴站 (TM186)', meters: 136 },
+      { id: 'B3CCA98CC6CE7C8C', name: '鳴琴站 (TM585)', meters: 160 },
     ],
   },
   {
@@ -352,8 +352,8 @@ export const LRT_GROUPS = [
     lat: 22.4045507,
     lon: 113.9700954,
     bus: [
+      { id: 'F7BE579A89615965', name: '建生邨樂生樓 (TM561)', meters: 142 },
       { id: '78B537644BD4FE00', name: '建生邨樂生樓 (TM376)', meters: 113 },
-      { id: '8667AD096EEED0A8', name: '建生邨樂生樓 (TM375)', meters: 113 },
     ],
   },
   {
@@ -364,8 +364,8 @@ export const LRT_GROUPS = [
     lat: 22.4027459,
     lon: 113.9719901,
     bus: [
-      { id: '54FF927A38FDC562', name: '大興總站 (TM946)', meters: 24 },
-      { id: '63E1BB3EDC884B4F', name: '大興總站 (TM948)', meters: 28 },
+      { id: 'EB64718829DFC071', name: '台山小學 (TM472)', meters: 167 },
+      { id: '92A8D40E66E76F6B', name: '大興體育館 (TM476)', meters: 97 },
     ],
   },
   {
@@ -376,8 +376,8 @@ export const LRT_GROUPS = [
     lat: 22.4025158,
     lon: 113.9746126,
     bus: [
-      { id: '92A8D40E66E76F6B', name: '大興體育館 (TM476)', meters: 233 },
-      { id: '629D4E7DD9EF1AC6', name: '大興體育館 (TM554)', meters: 259 },
+      { id: 'CBE54DB551C24A02', name: '紅橋 (TM133)', meters: 262 },
+      { id: 'D9B82EE66AFF2975', name: '紅橋 (TM134)', meters: 264 },
     ],
   },
   {
@@ -400,8 +400,8 @@ export const LRT_GROUPS = [
     lat: 22.3812061,
     lon: 113.9703786,
     bus: [
+      { id: 'F69B2B317BEB37A3', name: '御海灣 (TM682)', meters: 100 },
       { id: '320704B87EF998D4', name: '御海灣 (TM423)', meters: 29 },
-      { id: 'D0236013EDCA9EB1', name: '御海灣 (TM424)', meters: 58 },
     ],
   },
   {
@@ -412,8 +412,8 @@ export const LRT_GROUPS = [
     lat: 22.3833066,
     lon: 113.973042,
     bus: [
-      { id: '4566E35B3D2C20B5', name: '豐景園 (TM155)', meters: 76 },
       { id: '64312A5DFF11636C', name: '豐景園 (TM156)', meters: 81 },
+      { id: 'CB2A65E69B2B71BE', name: '翠寧花園 (TM157)', meters: 157 },
     ],
   },
   {
@@ -424,7 +424,7 @@ export const LRT_GROUPS = [
     lat: 22.3845824,
     lon: 113.9750384,
     bus: [
-      { id: '1D44677AEFBA8773', name: '兆麟苑 (TM615)', meters: 44 },
+      { id: 'CB2A65E69B2B71BE', name: '翠寧花園 (TM157)', meters: 98 },
       { id: '07B714029E91FD81', name: '兆麟苑 (TM614)', meters: 51 },
     ],
   },
@@ -436,8 +436,8 @@ export const LRT_GROUPS = [
     lat: 22.3876044,
     lon: 113.9751,
     bus: [
-      { id: '5A592ED96E34B583', name: '友愛邨 (TM164)', meters: 21 },
-      { id: '5264F4D691BA47AD', name: '友愛邨 (TM161)', meters: 21 },
+      { id: '59081A58EA5BC728', name: '友愛邨 (TM162)', meters: 26 },
+      { id: '4D02E857ADDE8AAF', name: '友愛邨 (TM163)', meters: 31 },
     ],
   },
   {
@@ -448,8 +448,8 @@ export const LRT_GROUPS = [
     lat: 22.3866677,
     lon: 113.9735606,
     bus: [
-      { id: '5264F4D691BA47AD', name: '友愛邨 (TM161)', meters: 203 },
       { id: '59081A58EA5BC728', name: '友愛邨 (TM162)', meters: 206 },
+      { id: '4D02E857ADDE8AAF', name: '友愛邨 (TM163)', meters: 209 },
     ],
   },
   {
@@ -461,7 +461,7 @@ export const LRT_GROUPS = [
     lon: 113.974973,
     bus: [
       { id: 'C1BF4509359B0895', name: '屯門市中心總站 (TM976)', meters: 62 },
-      { id: 'A859FDC2ED9ECEA1', name: '屯門市中心 (TM973)', meters: 64 },
+      { id: '5D14B75687F60509', name: '屯門公園 (TM167)', meters: 84 },
     ],
   },
   {
@@ -472,8 +472,8 @@ export const LRT_GROUPS = [
     lat: 22.3938221,
     lon: 113.973107,
     bus: [
-      { id: 'D9582C2A1BAD56C7', name: '杯渡路屯門站 (TM176)', meters: 59 },
-      { id: '1B21C4E917FBA155', name: '杯渡路屯門站 (TM601)', meters: 90 },
+      { id: '79D68EE7C6CBAB9D', name: '屯門站總站 (TM954)', meters: 156 },
+      { id: 'D74B67D55C63895F', name: '屯門站總站 (TM953)', meters: 132 },
     ],
   },
   {
@@ -484,8 +484,8 @@ export const LRT_GROUPS = [
     lat: 22.3946674,
     lon: 113.9767232,
     bus: [
+      { id: 'F269ACD809D1B43E', name: '何福堂書院 (TM297)', meters: 175 },
       { id: '8121695666A4D9CE', name: '屯門屯仁街 (TM718)', meters: 65 },
-      { id: 'D424B5C4A9386481', name: '屯門屯仁街 (TM718a)', meters: 65 },
     ],
   },
   {
@@ -497,7 +497,7 @@ export const LRT_GROUPS = [
     lon: 113.9774708,
     bus: [
       { id: '642F7D358D36F715', name: '新圍仔 (TM296)', meters: 7 },
-      { id: '5238463F47B490D6', name: '新墟街市 (TM715)', meters: 145 },
+      { id: 'F269ACD809D1B43E', name: '何福堂書院 (TM297)', meters: 169 },
     ],
   },
   {
@@ -508,8 +508,8 @@ export const LRT_GROUPS = [
     lat: 22.4002799,
     lon: 113.978045,
     bus: [
-      { id: '6FB7BC1E5BC1E4EE', name: '紅橋 (TM712)', meters: 178 },
-      { id: '8C32D9DDB85891A6', name: '紅橋 (TM711)', meters: 182 },
+      { id: 'BC301D7E7F063331', name: '新墟街市 (TM132)', meters: 222 },
+      { id: '6D9EB45795E40B40', name: '庇護工場 (TM244)', meters: 187 },
     ],
   },
   {
@@ -520,8 +520,8 @@ export const LRT_GROUPS = [
     lat: 22.4031239,
     lon: 113.9795382,
     bus: [
+      { id: '02824AAFC038FA20', name: '景峰花園 (TM246)', meters: 41 },
       { id: 'FA553D19AD960A9B', name: '景峰花園 (TM294)', meters: 24 },
-      { id: '03E44C30CECCFCEC', name: '景峰花園 (TM295)', meters: 24 },
     ],
   },
   {
@@ -533,7 +533,7 @@ export const LRT_GROUPS = [
     lon: 113.9788053,
     bus: [
       { id: '0FB4AEA370913FD2', name: '屯門醫院(鳳地站) (TM248)', meters: 31 },
-      { id: 'A8B141D2ED68F7E1', name: '屯門醫院(鳳地站) (TM247)', meters: 54 },
+      { id: '876057D899CE09C9', name: '彩暉花園 (TM293)', meters: 227 },
     ],
   },
   {
@@ -545,7 +545,7 @@ export const LRT_GROUPS = [
     lon: 113.981894,
     bus: [
       { id: '46D1A9FD1F84CA5C', name: '藍地站 (TM284)', meters: 58 },
-      { id: '29395B362BEDBA1E', name: '藍地站 (TM283)', meters: 58 },
+      { id: '7FE552E3792C9047', name: '藍地站 (TM340)', meters: 60 },
     ],
   },
   {
@@ -557,7 +557,7 @@ export const LRT_GROUPS = [
     lon: 113.9866093,
     bus: [
       { id: 'A1541789F09C89BA', name: '泥圍 (TM277)', meters: 49 },
-      { id: 'C1528848376F5B95', name: '泥圍 (TM278)', meters: 49 },
+      { id: '468DB19F9ECA7507', name: '泥圍站 (TM344)', meters: 58 },
     ],
   },
   {
@@ -569,7 +569,7 @@ export const LRT_GROUPS = [
     lon: 113.9922331,
     bus: [
       { id: 'F1A6B3410C090751', name: '鍾屋村站 (TM348)', meters: 9 },
-      { id: 'CD077FC371E93248', name: '鍾屋村站 (TM349)', meters: 9 },
+      { id: '92A09EC9B712A1ED', name: '鍾屋村站 (TM273)', meters: 47 },
     ],
   },
   {
@@ -581,7 +581,7 @@ export const LRT_GROUPS = [
     lon: 113.9974787,
     bus: [
       { id: '0BFC5F7FC4A2D431', name: '洪水橋站 (YL350)', meters: 40 },
-      { id: '4CEB8ACF469C6AD5', name: '洪水橋站 (YL351)', meters: 40 },
+      { id: '8FA8E142E834CB7C', name: '洪水橋站 (YL270)', meters: 42 },
     ],
   },
   {
@@ -592,8 +592,8 @@ export const LRT_GROUPS = [
     lat: 22.4402476,
     lon: 114.0074215,
     bus: [
-      { id: '60A4F4A41CD61FAC', name: '新起村 (YL265)', meters: 31 },
       { id: 'B88640E0CA83F12C', name: '塘坊村站 (YL354)', meters: 76 },
+      { id: '147D513A708AA741', name: '灰沙圍 (YL353)', meters: 261 },
     ],
   },
   {
@@ -605,7 +605,7 @@ export const LRT_GROUPS = [
     lon: 114.012039,
     bus: [
       { id: 'A8482B15AD6E89A3', name: '屏山 (YL355)', meters: 14 },
-      { id: 'A11650027CA0992C', name: '屏山屏興里 (YL610)', meters: 197 },
+      { id: 'A1A1B10F5CE291AC', name: '朗天苑朗松閣 (YL263)', meters: 244 },
     ],
   },
   {
@@ -616,8 +616,8 @@ export const LRT_GROUPS = [
     lat: 22.4451439,
     lon: 114.0056157,
     bus: [
-      { id: '2C0C842FA050B03D', name: '上章圍 (YL114)', meters: 99 },
-      { id: '88F23AAD9EC3F5C6', name: '屏欣苑 (YL612)', meters: 132 },
+      { id: '71C5FC4FF2FDE0CA', name: '天水圍站 (YL614)', meters: 317 },
+      { id: 'EF0567DCF0D20204', name: '天水圍站 (YL613)', meters: 320 },
     ],
   },
   {
@@ -629,7 +629,7 @@ export const LRT_GROUPS = [
     lon: 114.0060435,
     bus: [
       { id: 'A264A7BA921EEE6E', name: '聚星樓 (TN201)', meters: 58 },
-      { id: '378A33FE9A4089DF', name: '聚星樓 (TN200)', meters: 58 },
+      { id: 'C20316E552E64387', name: '天祐苑 (TN593)', meters: 124 },
     ],
   },
   {
@@ -641,7 +641,7 @@ export const LRT_GROUPS = [
     lon: 114.006033,
     bus: [
       { id: '1D202282C0A82F12', name: '天耀邨耀豐樓 (TN230)', meters: 32 },
-      { id: '0E63473C95554A20', name: '天慈邨 (TN605)', meters: 34 },
+      { id: '021872C0E263AC46', name: '天慈邨 (TN604)', meters: 39 },
     ],
   },
   {
@@ -652,8 +652,8 @@ export const LRT_GROUPS = [
     lat: 22.4503875,
     lon: 114.0027686,
     bus: [
-      { id: '553E041377D7A0CE', name: '天耀總站 (TN922)', meters: 31 },
-      { id: '86C5B251AF5F68BF', name: '天水圍警署 (TN207)', meters: 31 },
+      { id: 'ABE1BADF8D43CB24', name: '天盛苑 (TN206)', meters: 100 },
+      { id: 'CB853E4BCBB13F30', name: '天耀邨耀民樓 (TN582)', meters: 91 },
     ],
   },
   {
@@ -665,7 +665,7 @@ export const LRT_GROUPS = [
     lon: 114.0011415,
     bus: [
       { id: '6A90A40248059768', name: '賞湖居 (TN210)', meters: 108 },
-      { id: 'DAC9F4035C02B5B2', name: '賞湖居 (TN211)', meters: 111 },
+      { id: '7898B605E39613A8', name: '天耀邨耀盛樓 (TN571)', meters: 132 },
     ],
   },
   {
@@ -676,8 +676,8 @@ export const LRT_GROUPS = [
     lat: 22.4549666,
     lon: 114.0057041,
     bus: [
-      { id: 'A6F5C93F89B0969B', name: '天水圍運動場 (TN213)', meters: 177 },
-      { id: 'B6C73B7C3607611B', name: '天耀邨耀豐樓 (TN231)', meters: 202 },
+      { id: '021872C0E263AC46', name: '天慈邨 (TN604)', meters: 215 },
+      { id: '1D202282C0A82F12', name: '天耀邨耀豐樓 (TN230)', meters: 215 },
     ],
   },
   {
@@ -688,7 +688,7 @@ export const LRT_GROUPS = [
     lat: 22.4575312,
     lon: 114.0049838,
     bus: [
-      { id: 'BAB02D19E8B67DB6', name: '景湖居 (TN603)', meters: 41 },
+      { id: 'D813C93D9AD1C45B', name: '景湖居 (TN240)', meters: 137 },
       { id: 'A4607B71730E8F46', name: '景湖居 (TN602)', meters: 69 },
     ],
   },
@@ -700,7 +700,7 @@ export const LRT_GROUPS = [
     lat: 22.4559333,
     lon: 113.9993735,
     bus: [
-      { id: 'F24C06FAF6EE076F', name: '天瑞邨 (TN509)', meters: 51 },
+      { id: 'FBBF4EB577663A13', name: '天瑞邨 (TN223)', meters: 111 },
       { id: '080EF1BEA737A5D3', name: '天瑞邨 (TN508)', meters: 55 },
     ],
   },
@@ -712,8 +712,8 @@ export const LRT_GROUPS = [
     lat: 22.4620072,
     lon: 113.9969877,
     bus: [
-      { id: '03FC9E0BC770B677', name: '天恩邨總站 (TN951)', meters: 48 },
-      { id: '1DAF9282E63CDEC2', name: '天恩邨總站 (TN952)', meters: 52 },
+      { id: 'A00D00FC2F4F8400', name: '天頌苑 (TN504)', meters: 101 },
+      { id: '67D80F37744E1277', name: '天頌苑 (TN505)', meters: 142 },
     ],
   },
   {
@@ -724,8 +724,8 @@ export const LRT_GROUPS = [
     lat: 22.4645618,
     lon: 113.9976633,
     bus: [
-      { id: 'F60E8E7D4B29135F', name: '天富苑欣富閣 (TN502)', meters: 24 },
       { id: '8D56DB404D264D5A', name: '天富苑欣富閣 (TN503)', meters: 27 },
+      { id: '73FE2D32F218DA9C', name: '天恩邨 (TN226)', meters: 57 },
     ],
   },
   {
@@ -736,8 +736,8 @@ export const LRT_GROUPS = [
     lat: 22.4596928,
     lon: 113.9996008,
     bus: [
-      { id: '56C0EAB471B9D966', name: '翠湖居 (TN260)', meters: 49 },
-      { id: '0F46D557819BD600', name: '翠湖居 (TN560)', meters: 73 },
+      { id: 'B10F5697E4DA810B', name: '天頌苑頌棋閣 (TN271)', meters: 246 },
+      { id: '5498C13EB8685C46', name: '天華邨 (TN224)', meters: 265 },
     ],
   },
   {
@@ -748,8 +748,8 @@ export const LRT_GROUPS = [
     lat: 22.4596764,
     lon: 114.0023185,
     bus: [
-      { id: '98927BE83CD53CC3', name: '天城路麗湖居 (TN601)', meters: 158 },
-      { id: '610F737B04D534D9', name: '天城路麗湖居 (TN600)', meters: 158 },
+      { id: 'AA92A3F2775F4F69', name: '天水圍市中心 (TN945)', meters: 168 },
+      { id: '0AE307AC4840B867', name: '天水圍市中心 (TN940)', meters: 168 },
     ],
   },
   {
@@ -760,8 +760,8 @@ export const LRT_GROUPS = [
     lat: 22.4627134,
     lon: 114.0016156,
     bus: [
+      { id: '308112BE50081258', name: '香港青年協會李兆基書院 (TN533)', meters: 260 },
       { id: 'FE801C732EC6EA42', name: '天晴邨晴彩樓 (TN552)', meters: 113 },
-      { id: 'B10F5697E4DA810B', name: '天頌苑頌棋閣 (TN271)', meters: 162 },
     ],
   },
   {
@@ -772,8 +772,8 @@ export const LRT_GROUPS = [
     lat: 22.4655398,
     lon: 114.0029634,
     bus: [
-      { id: '797CC0222B9EFBEF', name: '天晴邨晴碧樓 (TN522)', meters: 128 },
-      { id: '147EF2F26EFE2BEF', name: '慧景軒 (TN255)', meters: 173 },
+      { id: '6D4E7B9D5F9584E7', name: '天晴邨晴雲樓 (TN252)', meters: 228 },
+      { id: 'A6C169DA579FC45B', name: '慧景軒 (TN530)', meters: 212 },
     ],
   },
   {
@@ -785,7 +785,7 @@ export const LRT_GROUPS = [
     lon: 114.0025345,
     bus: [
       { id: '42AEF6365E78DA56', name: '香港濕地公園 (TN402)', meters: 5 },
-      { id: '90A0828B57A59906', name: '香港濕地公園 (TN301)', meters: 37 },
+      { id: '4C86E1F44AE9C25B', name: '香港濕地公園 (TN300)', meters: 43 },
     ],
   },
   {
@@ -796,8 +796,8 @@ export const LRT_GROUPS = [
     lat: 22.4697292,
     lon: 114.0007557,
     bus: [
-      { id: '223DAE7E925E3BB9', name: '天恆邨總站 (TN972)', meters: 111 },
-      { id: 'A22733425D08E68A', name: '天恆邨總站 (TN971)', meters: 115 },
+      { id: '8753A8442C2FFF53', name: '天逸邨逸潭樓 (TN501)', meters: 187 },
+      { id: '42AEF6365E78DA56', name: '香港濕地公園 (TN402)', meters: 189 },
     ],
   },
   {
@@ -809,7 +809,7 @@ export const LRT_GROUPS = [
     lon: 113.9990556,
     bus: [
       { id: 'A264255E81F51111', name: '天澤邨 (TN229)', meters: 138 },
-      { id: '50C1510101650C40', name: '天澤邨 (TN228a)', meters: 138 },
+      { id: '8753A8442C2FFF53', name: '天逸邨逸潭樓 (TN501)', meters: 183 },
     ],
   },
   {
@@ -820,8 +820,8 @@ export const LRT_GROUPS = [
     lat: 22.4444798,
     lon: 114.0202344,
     bus: [
-      { id: 'BCC6E5BA6810FED6', name: '水邊圍邨 (YL358)', meters: 42 },
-      { id: 'F6282DDA0B14F96A', name: '水邊圍邨 (YL357)', meters: 52 },
+      { id: 'A010FE2C473103A8', name: '水邊村 (YL259)', meters: 115 },
+      { id: '70FEB409760C77EE', name: '元朗公園 (YL261)', meters: 146 },
     ],
   },
   {
@@ -832,7 +832,7 @@ export const LRT_GROUPS = [
     lat: 22.4445292,
     lon: 114.0238504,
     bus: [
-      { id: '1DBADE3376C4149E', name: '元朗警署 (YL257)', meters: 11 },
+      { id: '6E85D42922E5A10C', name: '元朗廣場 (YL360)', meters: 22 },
       { id: '1B0FD9C27F5FE0BE', name: '元朗警署 (YL258)', meters: 14 },
     ],
   },
@@ -844,8 +844,8 @@ export const LRT_GROUPS = [
     lat: 22.4445043,
     lon: 114.0269401,
     bus: [
-      { id: '2FB355A2C89B7922', name: '元朗同樂街 (YL368)', meters: 59 },
       { id: 'D9CE618F99BAC2B6', name: '元朗康樂路 (YL254)', meters: 88 },
+      { id: '43E5D3A445382F82', name: '元朗大棠路 (YL252)', meters: 133 },
     ],
   },
   {
@@ -856,8 +856,8 @@ export const LRT_GROUPS = [
     lat: 22.4444678,
     lon: 114.0295529,
     bus: [
-      { id: '51BD0FD05C62F3F4', name: '元朗谷亭街 (YL374)', meters: 80 },
-      { id: '3D566753F149907F', name: '谷亭街 (YL378)', meters: 85 },
+      { id: 'D54B0CA58FE5559D', name: '元朗同樂街 (YL372)', meters: 120 },
+      { id: '445B2A02DB891CA9', name: '元朗谷亭街 (YL375)', meters: 92 },
     ],
   },
   {
@@ -868,8 +868,8 @@ export const LRT_GROUPS = [
     lat: 22.4456518,
     lon: 114.0346405,
     bus: [
-      { id: '87E436C0C5646BCE', name: '元朗站總站 (YL961)', meters: 62 },
-      { id: '08594543968C22E3', name: '元朗站總站 (YL962)', meters: 62 },
+      { id: '0C943B7308FF4DCC', name: '形點 II (YL390)', meters: 131 },
+      { id: '723EF8D7809D3ADB', name: '形點 II (YL392)', meters: 122 },
     ],
   },
   {
@@ -880,8 +880,8 @@ export const LRT_GROUPS = [
     lat: 22.3825172,
     lon: 113.9766734,
     bus: [
+      { id: 'C90375A74B02D2E8', name: '三聖邨 (TM304)', meters: 236 },
       { id: '2659CEA57836F600', name: '恒福花園 (TM420)', meters: 43 },
-      { id: '4B6E603162A11A02', name: '三聖總站 (TM986)', meters: 64 },
     ],
   },
 ] as const;

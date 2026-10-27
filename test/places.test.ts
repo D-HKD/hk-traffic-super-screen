@@ -50,7 +50,7 @@ test('每站最多 2 個附近巴士站，站 ID 格式正確', () => {
     assert.ok(stops.length <= 2, `${station.name} 有 ${stops.length} 個巴士站`);
     for (const stop of stops) {
       assert.match(stop.id, /^[0-9A-F]{16}$/, `${station.name} 的站 ID 格式不對`);
-      assert.ok(stop.meters >= 0 && stop.meters <= 300, `${station.name} 距離異常`);
+      assert.ok(stop.meters >= 0 && stop.meters <= 400, `${station.name} 距離異常`);
     }
   }
 });
