@@ -13,8 +13,8 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon-192.png">
-  <script type="module" crossorigin src="./assets/index-CrdCPvzc.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BQo4d1Cn.css">
+  <script type="module" crossorigin src="./assets/index-zA9pSwCv.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-URl1F1wa.css">
 </head>
 <body>
 <div class="app-shell">
@@ -89,8 +89,12 @@
       <div class="station-stack" id="tml-stack"></div>
     </article>
     <article class="rail-panel lrt-panel panel">
-      <header class="panel-head"><div class="line-title"><span class="line-icon" id="lrt-art" aria-hidden="true"></span><div><h3>輕鐵 <i>LRT</i></h3><small>先選站，再睇班次</small></div></div><span class="live-dot" id="lrt-badge">未連線</span></header>
-      <div class="lrt-tabs" id="lrt-tabs" role="tablist" aria-label="選擇輕鐵站"></div>
+      <header class="panel-head"><div class="line-title"><span class="line-icon" id="lrt-art" aria-hidden="true"></span><div><h3>輕鐵 <i>LRT</i></h3><small>全屯元天 68 個站</small></div></div><span class="live-dot" id="lrt-badge">未連線</span></header>
+      <div class="lrt-picker">
+        <label for="lrt-station">輕鐵站</label>
+        <select id="lrt-station" aria-label="選擇輕鐵站"></select>
+        <span class="lrt-hint" id="lrt-count">68 個站</span>
+      </div>
       <div id="LRT-eta" class="lrt-list"></div>
       <div class="lrt-others" id="lrt-others"></div>
       <p class="source-note lrt-note">路線顏色只為方便辨識，唔係官方路線色。</p>
