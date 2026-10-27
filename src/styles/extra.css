@@ -304,3 +304,12 @@
 .nlb-head small{font-size:9px;color:var(--muted)}
 .nlb-row{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:7px 0}
 .nlb-chip{background:rgba(255,180,80,.14);border-color:rgba(255,180,80,.45);color:#ffce8a}
+
+/* 舊瀏覽器（Chromium < 86，例如三星電視 Tizen）冇 :focus-visible，
+   但電視要用遙控器方向鍵操作，所以補一個純 :focus 焦點框。 */
+@supports not selector(:focus-visible){
+  button:focus, select:focus, a:focus, [tabindex]:focus{
+    outline:2px solid var(--cyan);
+    outline-offset:2px;
+  }
+}

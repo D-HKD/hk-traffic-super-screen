@@ -10,6 +10,7 @@ import type { LrtRow } from './types';
 export { LRT_GROUPS } from '../config';
 
 import { LRT_GROUPS } from '../config';
+import { settleAll } from '../lib/promise';
 
 const MAX_ROWS = 8;
 
@@ -66,7 +67,7 @@ export async function fetchLrtStations(codes: readonly string[], options: Reques
   const groups = LRT_GROUPS.filter((group) => codes.includes(group.station));
   if (groups.length === 0) return [];
 
-  const results = await Promise.allSettled(
+  const results = await settleAll(
     groups.map(async (group) => {
       const target = `https://rt.data.gov.hk/v1/transport/mtr/lrt/getSchedule?station_id=${group.station}&with_special=1`;
       return getJson('/mtr', { url: target }, (raw) => parseLrtSchedule(raw, group), options);

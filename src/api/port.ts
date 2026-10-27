@@ -1,6 +1,7 @@
 import type { PortArrival } from './types';
 import { array, isRecord, record } from '../lib/validate';
 import { getJson, type RequestOptions } from './client';
+import { settleAll } from '../lib/promise';
 
 /**
  * 口岸線：往深圳灣口岸的巴士。
@@ -66,7 +67,7 @@ function parseCtb(payload: unknown, line: PortLine, now: Date): PortArrival[] {
 }
 
 export async function fetchPortArrivals(now: Date, options: RequestOptions): Promise<readonly PortArrival[]> {
-  const results = await Promise.allSettled(
+  const results = await settleAll(
     PORT_LINES.map((line) => {
       if (line.operator === 'NLB') {
         return getJson('/api/nlb', { route: line.routeId, stop: line.stopId }, (raw) => parseNlb(raw, line, now), options);

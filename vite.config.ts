@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   base: './',
   build: {
-    target: 'es2022',
+    target: ['es2017', 'chrome63', 'safari12'],
     assetsInlineLimit: 2048,
     cssMinify: true,
     sourcemap: false,

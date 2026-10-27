@@ -4,6 +4,7 @@ import { getJson, type RequestOptions } from './client';
 import type { Arrival, Direction, StationArrivals } from './types';
 
 import { TML_STATIONS } from '../config';
+import { settleAll } from '../lib/promise';
 
 export { TML_STATIONS };
 
@@ -129,7 +130,7 @@ async function fetchPerStation(codes: readonly string[], options: RequestOptions
   const map = new Map<string, StationArrivals>();
   const failed: string[] = [];
 
-  const first = await Promise.allSettled(codes.map((code) => fetchStation(code, options)));
+  const first = await settleAll(codes.map((code) => fetchStation(code, options)));
   first.forEach((result, index) => {
     const code = codes[index];
     if (!code) return;
@@ -139,7 +140,7 @@ async function fetchPerStation(codes: readonly string[], options: RequestOptions
 
   if (failed.length > 0 && !options.signal?.aborted) {
     await delay(400, options.signal);
-    const retry = await Promise.allSettled(failed.map((code) => fetchStation(code, options)));
+    const retry = await settleAll(failed.map((code) => fetchStation(code, options)));
     retry.forEach((result, index) => {
       const code = failed[index];
       if (code && result.status === 'fulfilled') map.set(code, result.value);
