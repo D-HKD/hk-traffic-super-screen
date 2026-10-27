@@ -13,6 +13,7 @@
 
 import { sendPush } from './push.js';
 import { ROAD_DEFS, aggregateSpeeds, parseDetectorInfoCsv, parseRawSpeedXml } from './roads.js';
+import { BUS_STOPS } from './busstops.js';
 
 const UPSTREAM = {
   weather: 'https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc',
@@ -455,6 +456,7 @@ export default {
               endpoints: [
                 '/api/rail?stations=TIS,LOP,YUL,SIH,TUM',
                 '/api/bus?stops=<16-hex-kmb-stop-id>',
+                '/api/bus/stops',
                 '/api/roads',
                 '/mtr?url=...',
                 '/weather',
@@ -476,6 +478,10 @@ export default {
           return await handleRail(url, request, env, ctx);
         case '/api/bus':
           return await handleBus(url, request, env, ctx);
+        case '/api/bus/stops':
+          return await edgeCached(request, `${url.origin}/api/bus/stops`, TTL.info, ctx, async () =>
+            json({ ok: true, stops: BUS_STOPS }, 200, request, env, TTL.info),
+          );
         case '/api/roads':
           return await handleRoads(request, env, ctx);
         case '/api/push/key':

@@ -1,25 +1,30 @@
-import type { BusArrival, Slice } from '../api/types';
+import type { AppState } from '../api/types';
+import { loadBusStops } from '../api/bus';
 import { groupByStop } from '../core/bus';
-import { busStopsFor } from '../core/places';
+import { busStopsFor, stationName } from '../core/places';
 import { walkLabel, walkMinutes } from '../core/walk';
-import { byId, h, replace, setText } from '../lib/dom';
+import { byId, h, on, replace, setText } from '../lib/dom';
 import { agoText, etaText, freshness } from '../lib/format';
 
 const STALE_MS = 3 * 60_000;
 const DEAD_MS = 20 * 60_000;
 const PER_STOP = 2;
 
-function badgeText(slice: Slice<readonly BusArrival[]>, now: Date): string {
-  if (slice.state === 'error') return '更新失敗';
-  if (!slice.updatedAt) return '載入中';
-  const level = freshness(slice.updatedAt, now, STALE_MS, DEAD_MS);
-  if (level === 'dead') return `過時（${agoText(slice.updatedAt, now)}）`;
-  if (level === 'stale') return `延遲（${agoText(slice.updatedAt, now)}）`;
-  return `已同步 ${agoText(slice.updatedAt, now)}`;
+export interface BusHandlers {
+  selectBusStop(id: string): void;
+}
+
+function badgeText(state: AppState['bus'], now: Date): string {
+  if (state.state === 'error') return '更新失敗';
+  if (!state.updatedAt) return '載入中';
+  const level = freshness(state.updatedAt, now, STALE_MS, DEAD_MS);
+  if (level === 'dead') return `過時（${agoText(state.updatedAt, now)}）`;
+  if (level === 'stale') return `延遲（${agoText(state.updatedAt, now)}）`;
+  return `已同步 ${agoText(state.updatedAt, now)}`;
 }
 
 /** 九巴路線號有字母（A37／E37C／259D），所以獨立一個 chip 樣式，唔跟輕鐵色相。 */
-function busRow(row: BusArrival): HTMLElement {
+function busRow(row: { route: string; dest: string; minutes: number }): HTMLElement {
   const eta = etaText(row.minutes);
   return h(
     'div',
@@ -35,38 +40,78 @@ function busRow(row: BusArrival): HTMLElement {
   );
 }
 
-export function renderBus(
-  slice: Slice<readonly BusArrival[]>,
-  stationCode: string,
-  stationName: string,
-  now: Date,
-): void {
-  setText(byId('bus-badge'), badgeText(slice, now));
+/**
+ * 1015 個站不可能一次過塞入 <select>；第一次打開選單才下載（Worker 邊緣快取 6 小時）。
+ */
+export function initBusPicker(handlers: BusHandlers): void {
+  const select = byId<HTMLSelectElement>('bus-stop');
+  let loaded = false;
 
-  const stops = busStopsFor(stationCode);
-  if (stops.length === 0) {
-    setText(byId('bus-stops'), '未設定附近巴士站');
+  const populate = async (): Promise<void> => {
+    if (loaded) return;
+    loaded = true;
+    try {
+      const list = await loadBusStops();
+      for (const area of ['屯門', '天水圍', '元朗']) {
+        const group = document.createElement('optgroup');
+        group.label = area;
+        for (const stop of list.filter((entry) => entry.area === area)) {
+          const option = document.createElement('option');
+          option.value = stop.id;
+          option.textContent = stop.name;
+          group.appendChild(option);
+        }
+        select.appendChild(group);
+      }
+      setText(byId('bus-count'), `${list.length} 個站`);
+    } catch {
+      loaded = false;
+      setText(byId('bus-count'), '清單載入失敗');
+    }
+  };
+
+  on(select, 'focus', () => void populate());
+  on(select, 'pointerdown', () => void populate());
+  on(select, 'change', () => handlers.selectBusStop(select.value));
+}
+
+export function renderBus(state: AppState, now: Date): void {
+  setText(byId('bus-badge'), badgeText(state.bus, now));
+
+  const select = document.getElementById('bus-stop') as HTMLSelectElement | null;
+  if (select && select.value !== state.ui.busStop) select.value = state.ui.busStop;
+
+  const chosen = state.ui.busStop;
+  const auto = chosen === 'auto';
+
+  let stops: readonly { id: string; name: string; meters: number }[] = [];
+  if (auto) {
+    stops = busStopsFor(state.ui.lrtStation);
+    if (stops.length === 0) {
+      setText(byId('bus-stops'), '未設定附近巴士站');
+    } else {
+      const longest = Math.max(...stops.map((stop) => walkMinutes(stop.meters)));
+      setText(byId('bus-stops'), `${stationName(state.ui.lrtStation)}站附近 ${stops.length} 個巴士站・步行 1-${longest} 分鐘（直線估算）`);
+    }
   } else {
-    const longest = Math.max(...stops.map((stop) => walkMinutes(stop.meters)));
-    setText(
-      byId('bus-stops'),
-      `${stationName}站附近 ${stops.length} 個巴士站・步行 1-${longest} 分鐘（直線估算）`,
-    );
+    const label = select?.selectedOptions[0]?.textContent ?? chosen;
+    stops = [{ id: chosen, name: label, meters: 0 }];
+    setText(byId('bus-stops'), `${label}（指定站）`);
   }
 
   const list = byId('bus-list');
-  if (!slice.data) {
-    if (slice.state === 'error') {
-      replace(list, h('div', { class: 'state-error', text: slice.error ?? '暫時取不到九巴到站資料' }));
+  if (!state.bus.data) {
+    if (state.bus.state === 'error') {
+      replace(list, h('div', { class: 'state-error', text: state.bus.error ?? '暫時取不到九巴到站資料' }));
     } else {
       replace(list, h('span', { class: 'skeleton', aria: { hidden: 'true' } }));
     }
     return;
   }
 
-  const groups = groupByStop(slice.data, stops, PER_STOP);
+  const groups = groupByStop(state.bus.data, stops, auto ? PER_STOP : 6);
   if (groups.length === 0) {
-    replace(list, h('div', { class: 'state-empty', text: '附近巴士站暫無即將到站班次' }));
+    replace(list, h('div', { class: 'state-empty', text: auto ? '附近巴士站暫無即將到站班次' : '此站暫無即將到站班次' }));
     return;
   }
 
@@ -80,7 +125,7 @@ export function renderBus(
           'div',
           { class: 'bus-group-head' },
           h('b', { text: group.stop.name }),
-          h('span', { title: `直線距離約 ${group.stop.meters} 米`, text: walkLabel(group.stop.meters) }),
+          h('span', { text: auto ? walkLabel(group.stop.meters) : '指定站' }),
         ),
         ...group.rows.map(busRow),
       ),

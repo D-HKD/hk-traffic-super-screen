@@ -292,3 +292,7 @@
   border-radius:10px;padding:9px 10px;font-size:12px;font-family:inherit;cursor:pointer}
 .lrt-picker select:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
 .lrt-hint{font-size:9px;color:var(--muted);white-space:nowrap}
+
+/* 巴士站下拉（1015 個站） */
+.bus-picker{padding-top:2px}
+.bus-picker select{max-width:100%}

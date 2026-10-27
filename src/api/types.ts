@@ -118,8 +118,10 @@ export interface UiState {
   readonly night: boolean;
   readonly filter: AlertFilter;
   readonly favorites: readonly string[];
-  /** 輕鐵面板目前選中的站（天榮／屯門／兆禧）。 */
+  /** 輕鐵面板目前選中的站號（例如 500）。 */
   readonly lrtStation: string;
+  /** 巴士面板：'auto' = 跟隨輕鐵站；否則係九巴站號。 */
+  readonly busStop: string;
 }
 
 export interface AppState {

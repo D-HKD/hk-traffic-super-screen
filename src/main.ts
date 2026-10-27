@@ -2,7 +2,7 @@ import './styles/base.css';
 import './styles/extra.css';
 
 import { errorMessage } from './api/client';
-import { fetchBusArrivals } from './api/bus';
+import { fetchBusArrivals, loadBusStops, type BusStopRef } from './api/bus';
 import { fetchLrtStations } from './api/lrt';
 import { PartialFailureError, TML_CODES, fetchTmlBatch } from './api/mtr';
 import { fetchTrafficNews } from './api/traffic';
@@ -10,7 +10,7 @@ import { idleSlice, type AlertFilter, type AppState, type ConnState, type Slice,
 import { fetchRoadSpeeds } from './api/roads';
 import { fetchWeather } from './api/weather';
 import { SEVERITY_LABEL, roadStatuses, sortByNewest } from './core/messages';
-import { nearestLrtStation, LRT_STATIONS, stationName } from './core/places';
+import { nearestLrtStation, LRT_STATIONS, stationName, busStopsFor } from './core/places';
 import { REFRESH_MS } from './config';
 import { currentPushState, subscribePush, unsubscribePush } from './push';
 import { Scheduler } from './core/scheduler';
@@ -22,6 +22,7 @@ import { renderApp } from './ui/app';
 import { initChrome, type Chrome, type ModalBlock } from './ui/chrome';
 import { mapsUrl } from './ui/location';
 import { initLrtPicker } from './ui/rail';
+import { initBusPicker } from './ui/bus';
 import { busIcon, railStrip, trainIcon, tramIcon } from './ui/rail-art';
 import { registerServiceWorker } from './pwa';
 
@@ -88,7 +89,7 @@ const store = createStore<AppState>({
   weather: idleSlice(),
   traffic: idleSlice(),
   gps: { status: 'idle', lat: null, lon: null, accuracyM: null, at: null },
-  ui: { night: prefs.night, filter: 'all', favorites: prefs.favorites, lrtStation: prefs.lrtStation },
+  ui: { night: prefs.night, filter: 'all', favorites: prefs.favorites, lrtStation: prefs.lrtStation, busStop: 'auto' },
 });
 
 let chrome: Chrome | null = null;
@@ -250,13 +251,20 @@ function selectLrtStation(code: string, announce = false): void {
   const state = store.get();
   if (state.ui.lrtStation === code) return;
   // 巴士面板跟隨選中嘅站，所以要清掉舊站資料，避免短暫顯示錯站班次。
-  store.update({ ui: { ...state.ui, lrtStation: code }, bus: idleSlice(), lrt: idleSlice() });
+  const resetBus = state.ui.busStop === 'auto';
+  store.update({ ui: { ...state.ui, lrtStation: code }, lrt: idleSlice(), ...(resetBus ? { bus: idleSlice() } : {}) });
   savePrefs(store.get());
-  scheduler?.refresh('bus');
   scheduler?.refresh('lrt');
+  if (resetBus) scheduler?.refresh('bus');
   if (announce) chrome?.toast('已切換車站', `${stationName(code)}站（巴士同步更新）`);
 }
 
+function selectBusStop(id: string): void {
+  const state = store.get();
+  if (state.ui.busStop === id) return;
+  store.update({ ui: { ...state.ui, busStop: id }, bus: idleSlice() });
+  scheduler?.refresh('bus');
+}
 function cycleFilter(): void {
   const state = store.get();
   const index = FILTER_ORDER.indexOf(state.ui.filter);
@@ -371,11 +379,20 @@ function startJobs(sched: Scheduler): void {
     name: 'bus',
     everyMs: REFRESH_MS.bus,
     async run(signal) {
-      const station = store.get().ui.lrtStation;
+      const state = store.get();
+      const chosen = state.ui.busStop;
+      let stops: readonly BusStopRef[];
+      if (chosen === 'auto') {
+        stops = busStopsFor(state.ui.lrtStation);
+      } else {
+        const list = await loadBusStops({ signal });
+        const hit = list.find((stop) => stop.id === chosen);
+        stops = hit ? [{ id: hit.id, name: hit.name }] : [];
+      }
       store.update({ bus: beginLoad(store.get().bus) });
       const started = performance.now();
       try {
-        const rows = await fetchBusArrivals(station, new Date(), { signal });
+        const rows = await fetchBusArrivals(stops, new Date(), { signal });
         store.update({ bus: succeed(rows, performance.now() - started) });
       } catch (error) {
         store.update({ bus: failed(store.get().bus, errorMessage(error)) });
@@ -492,6 +509,7 @@ byId('tml-strip').append(railStrip());
 
 bindActions();
 initLrtPicker({ selectLrtStation });
+initBusPicker({ selectBusStop });
 chrome.setNight(prefs.night);
 
 void currentPushState().then((state) => {

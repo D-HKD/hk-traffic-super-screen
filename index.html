@@ -99,6 +99,11 @@
     </article>
     <article class="rail-panel bus-panel panel">
       <header class="panel-head"><div class="line-title"><span class="line-icon" id="bus-art" aria-hidden="true"></span><div><h3>巴士 <i>KMB</i></h3><small>跟住你選中嘅輕鐵站</small></div></div><span class="live-dot" id="bus-badge">未連線</span></header>
+      <div class="lrt-picker bus-picker">
+        <label for="bus-stop">巴士站</label>
+        <select id="bus-stop" aria-label="選擇巴士站"><option value="auto">自動（跟隨輕鐵站）</option></select>
+        <span class="lrt-hint" id="bus-count">1015 個站</span>
+      </div>
       <p class="source-note bus-stops" id="bus-stops">—</p>
       <div id="bus-list" class="bus-list"></div>
       <p class="source-note">只涵蓋九巴及龍運（同一官方 feed，含機場 A／E 線）；城巴、港鐵巴士未接入。</p>
