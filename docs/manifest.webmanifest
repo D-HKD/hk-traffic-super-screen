@@ -1,0 +1,26 @@
+{
+  "name": "香港交通警報中心 v2",
+  "short_name": "HK交通警報",
+  "description": "屯門、元朗、天水圍即時交通、鐵路到站、天氣與道路消息，每項資料標示來源與更新時間。",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "lang": "zh-Hant-HK",
+  "dir": "ltr",
+  "background_color": "#040b14",
+  "theme_color": "#06111f",
+  "categories": ["travel", "navigation", "utilities"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "即時到站", "url": "./#rail" },
+    { "name": "道路消息", "url": "./#traffic" }
+  ]
+}
