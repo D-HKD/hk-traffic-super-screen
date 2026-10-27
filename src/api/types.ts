@@ -59,6 +59,7 @@ export interface BusArrival {
   readonly dest: string;
   readonly minutes: number;
   readonly stop: string;
+  readonly stopId: string;
   readonly operator: string;
 }
 

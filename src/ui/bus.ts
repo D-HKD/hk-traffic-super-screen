@@ -1,10 +1,13 @@
 import type { BusArrival, Slice } from '../api/types';
+import { groupByStop } from '../core/bus';
 import { busStopsFor } from '../core/places';
+import { walkLabel, walkMinutes } from '../core/walk';
 import { byId, h, replace, setText } from '../lib/dom';
 import { agoText, etaText, freshness } from '../lib/format';
 
 const STALE_MS = 3 * 60_000;
 const DEAD_MS = 20 * 60_000;
+const PER_STOP = 2;
 
 function badgeText(slice: Slice<readonly BusArrival[]>, now: Date): string {
   if (slice.state === 'error') return '更新失敗';
@@ -15,12 +18,6 @@ function badgeText(slice: Slice<readonly BusArrival[]>, now: Date): string {
   return `已同步 ${agoText(slice.updatedAt, now)}`;
 }
 
-/** 站名最後一段就係九巴站編號（例如「天水圍市中心 TN940」→ TN940）。 */
-function stopCode(name: string): string {
-  const match = /([A-Z]{2}\d{3})$/.exec(name);
-  return match?.[1] ?? name;
-}
-
 /** 九巴路線號有字母（A37／E37C／259D），所以獨立一個 chip 樣式，唔跟輕鐵色相。 */
 function busRow(row: BusArrival): HTMLElement {
   const eta = etaText(row.minutes);
@@ -28,12 +25,7 @@ function busRow(row: BusArrival): HTMLElement {
     'div',
     { class: 'bus-row' },
     h('span', { class: 'bus-chip', text: row.route }),
-    h(
-      'div',
-      { class: 'bus-info' },
-      h('b', { text: row.dest ? `往${row.dest}` : '目的地不詳' }),
-      h('small', { text: `上車站 ${stopCode(row.stop)}` }),
-    ),
+    h('div', { class: 'bus-info' }, h('b', { text: row.dest ? `往${row.dest}` : '目的地不詳' })),
     h(
       'strong',
       { class: eta.due ? 'due' : undefined },
@@ -43,16 +35,24 @@ function busRow(row: BusArrival): HTMLElement {
   );
 }
 
-export function renderBus(slice: Slice<readonly BusArrival[]>, stationCode: string, stationName: string, now: Date): void {
+export function renderBus(
+  slice: Slice<readonly BusArrival[]>,
+  stationCode: string,
+  stationName: string,
+  now: Date,
+): void {
   setText(byId('bus-badge'), badgeText(slice, now));
 
   const stops = busStopsFor(stationCode);
-  const stopLabel = stops.length > 0 ? stops.map((stop) => `${stop.name}`).join('、') : '未設定';
-  const meters = stops.length > 0 ? Math.min(...stops.map((stop) => stop.meters)) : null;
-  setText(
-    byId('bus-stops'),
-    `${stationName}站附近：${stopLabel}${meters !== null ? `（約 ${meters} 米）` : ''}`,
-  );
+  if (stops.length === 0) {
+    setText(byId('bus-stops'), '未設定附近巴士站');
+  } else {
+    const longest = Math.max(...stops.map((stop) => walkMinutes(stop.meters)));
+    setText(
+      byId('bus-stops'),
+      `${stationName}站附近 ${stops.length} 個巴士站・步行 1-${longest} 分鐘（直線估算）`,
+    );
+  }
 
   const list = byId('bus-list');
   if (!slice.data) {
@@ -64,10 +64,26 @@ export function renderBus(slice: Slice<readonly BusArrival[]>, stationCode: stri
     return;
   }
 
-  if (slice.data.length === 0) {
+  const groups = groupByStop(slice.data, stops, PER_STOP);
+  if (groups.length === 0) {
     replace(list, h('div', { class: 'state-empty', text: '附近巴士站暫無即將到站班次' }));
     return;
   }
 
-  replace(list, ...slice.data.map(busRow));
+  replace(
+    list,
+    ...groups.map((group) =>
+      h(
+        'section',
+        { class: 'bus-group' },
+        h(
+          'div',
+          { class: 'bus-group-head' },
+          h('b', { text: group.stop.name }),
+          h('span', { title: `直線距離約 ${group.stop.meters} 米`, text: walkLabel(group.stop.meters) }),
+        ),
+        ...group.rows.map(busRow),
+      ),
+    ),
+  );
 }

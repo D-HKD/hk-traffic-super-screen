@@ -248,3 +248,10 @@
 
 .road-dirs{grid-column:1/-1;font-size:8.5px;color:var(--cyan);opacity:.75;line-height:1.4;margin-top:1px}
 
+
+/* 巴士：按上車站分組 */
+.bus-group{padding:0 0 4px}
+.bus-group+ .bus-group{border-top:1px solid rgba(50,220,255,.14);margin-top:2px}
+.bus-group-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:9px 0 2px}
+.bus-group-head b{font-size:11px;color:var(--cyan);font-weight:600;letter-spacing:.02em}
+.bus-group-head span{font-size:9px;color:var(--muted);white-space:nowrap}

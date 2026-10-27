@@ -20,7 +20,7 @@ function minutesUntil(iso: string, now: Date): number | null {
   return diff < 0 ? 0 : diff;
 }
 
-export function parseStopEta(payload: unknown, stopName: string, now: Date): BusArrival[] {
+export function parseStopEta(payload: unknown, stop: { id: string; name: string }, now: Date): BusArrival[] {
   const root = record(payload, '九巴回應');
   const data = root['data'];
   if (!Array.isArray(data)) return [];
@@ -40,7 +40,8 @@ export function parseStopEta(payload: unknown, stopName: string, now: Date): Bus
       route,
       dest: optionalText(entry['dest_tc'], 'dest_tc') ?? '',
       minutes,
-      stop: stopName,
+      stop: stop.name,
+      stopId: stop.id,
       operator: optionalText(entry['co'], 'co') ?? 'KMB',
     });
   }
@@ -91,7 +92,7 @@ export async function fetchBusArrivals(
   for (const stop of stops) {
     const rows = payload[stop.id];
     if (rows === undefined) continue;
-    merged.push(...parseStopEta(rows, stop.name, now));
+    merged.push(...parseStopEta(rows, stop, now));
   }
 
   merged.sort((a, b) => a.minutes - b.minutes);

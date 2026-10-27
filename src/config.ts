@@ -77,6 +77,7 @@ export const LRT_GROUPS = [
     bus: [
       { id: '0AE307AC4840B867', name: '天水圍市中心 TN940', meters: 168 },
       { id: 'AA92A3F2775F4F69', name: '天水圍市中心 TN945', meters: 168 },
+      { id: 'DFC270E9F05B557E', name: '天水圍市中心 TN941', meters: 168 },
     ],
   },
   {
@@ -88,6 +89,7 @@ export const LRT_GROUPS = [
     bus: [
       { id: '79D68EE7C6CBAB9D', name: '屯門站總站 TM954', meters: 156 },
       { id: 'D74B67D55C63895F', name: '屯門站總站 TM953', meters: 132 },
+      { id: '69EA07FBAB612E68', name: '屯門站總站 TM952', meters: 156 },
     ],
   },
   {
