@@ -9,7 +9,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const ROOT = resolve(import.meta.dirname, '..');
@@ -32,8 +32,13 @@ if (git('rev-parse', '--abbrev-ref', 'HEAD') !== 'main') {
 console.log('\n▶ Build');
 run(process.execPath, [join(ROOT, 'node_modules', 'vite', 'bin', 'vite.js'), 'build']);
 
-console.log('\n▶ 複製到 docs/（保留 *.png 截圖）');
+console.log('\n▶ 清理舊 build 輸出（保留 *.png 截圖）');
 if (!existsSync(DOCS)) console.error('✗ 找不到 docs/');
+for (const stale of ['assets', 'index.html', 'sw.js', 'manifest.webmanifest']) {
+  rmSync(join(DOCS, stale), { recursive: true, force: true });
+}
+
+console.log('▶ 複製 dist → docs/');
 cpSync(DIST, DOCS, { recursive: true, force: true });
 // GitHub Pages 用 Jekyll 會忽略部分檔案，加 .nojekyll 關掉
 writeFileSync(join(DOCS, '.nojekyll'), '');

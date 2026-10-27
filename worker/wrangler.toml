@@ -2,22 +2,31 @@ name = "hk-traffic-super-proxy"
 main = "src/index.js"
 compatibility_date = "2026-01-01"
 
-# Cron Trigger：每 5 分鐘檢查運輸署新消息（Web Push 用）
+# Cron Trigger：每 5 分鐘檢查運輸署新消息（只在啟用 Web Push 後才有用）
 [triggers]
 crons = ["*/5 * * * *"]
 
-# Web Push 訂閱儲存（KV）。建立方法：
-#   npx wrangler kv namespace create SUBSCRIPTIONS
-# 然後把回傳的 id 貼落下面。
-[[kv_namespaces]]
-binding = "SUBSCRIPTIONS"
-id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
-
 [vars]
-# VAPID 的聯絡人（必須是 mailto: 或 https URL）
+# VAPID 的聯絡人（必須是 mailto: 或 https URL）。只在啟用推送時需要。
 VAPID_SUBJECT = "mailto:you@example.com"
+
 # 可選：收窄允許的來源（逗號分隔）。留空 = 允許任何來源（全部是公開唯讀資料）。
 # ALLOWED_ORIGINS = "https://d-hkd.github.io,http://localhost:4173"
+
+# ---------------------------------------------------------------
+# Web Push 用的 KV 綁定（**預設註解掉**，所以第一次 deploy 一定成功）
+#
+# 想啟用背景推送時：
+#   1. npx wrangler kv namespace create SUBSCRIPTIONS
+#   2. 把回傳的 id 貼落下面，並取消註解整段
+#   3. npx wrangler secret put VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY
+#   4. npx wrangler deploy
+#
+# 未啟用時：/api/push/* 會回 503，前端會如實顯示「伺服器未設定推送」。
+# ---------------------------------------------------------------
+# [[kv_namespaces]]
+# binding = "SUBSCRIPTIONS"
+# id = "貼上你的 KV namespace id"
 
 # VAPID 金鑰**唔好**寫入本檔。用 secret：
 #   npx wrangler secret put VAPID_PUBLIC_KEY
