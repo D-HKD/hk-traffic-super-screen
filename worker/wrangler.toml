@@ -8,7 +8,7 @@ crons = ["*/5 * * * *"]
 
 [vars]
 # VAPID 的聯絡人（必須是 mailto: 或 https URL）。只在啟用推送時需要。
-VAPID_SUBJECT = "mailto:you@example.com"
+VAPID_SUBJECT = "mailto:idyl.2014061@gmail.com"
 
 # 可選：收窄允許的來源（逗號分隔）。留空 = 允許任何來源（全部是公開唯讀資料）。
 # ALLOWED_ORIGINS = "https://d-hkd.github.io,http://localhost:4173"
@@ -24,9 +24,9 @@ VAPID_SUBJECT = "mailto:you@example.com"
 #
 # 未啟用時：/api/push/* 會回 503，前端會如實顯示「伺服器未設定推送」。
 # ---------------------------------------------------------------
-# [[kv_namespaces]]
-# binding = "SUBSCRIPTIONS"
-# id = "貼上你的 KV namespace id"
+[[kv_namespaces]]
+binding = "SUBSCRIPTIONS"
+id = "44c53d5b5fe6448fb5fbaaf5afd0fbd8"
 
 # VAPID 金鑰**唔好**寫入本檔。用 secret：
 #   npx wrangler secret put VAPID_PUBLIC_KEY

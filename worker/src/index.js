@@ -405,8 +405,10 @@ export default {
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(request, env) });
     }
-    if (request.method !== 'GET') {
-      return json({ ok: false, error: '只支援 GET' }, 405, request, env);
+    // 大部分端點唯讀；只有推送訂閱／取消接受 POST。
+    const pushWrite = url.pathname === '/api/push/subscribe' || url.pathname === '/api/push/unsubscribe';
+    if (request.method !== 'GET' && !(request.method === 'POST' && pushWrite)) {
+      return json({ ok: false, error: '此端點只支援 GET' }, 405, request, env);
     }
 
     try {
