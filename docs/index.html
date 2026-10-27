@@ -13,8 +13,8 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon-192.png">
-  <script type="module" crossorigin src="./assets/index-BK8KxADl.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BI0iGTPA.css">
+  <script type="module" crossorigin src="./assets/index-BZgmzMDd.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-D7ql7G8j.css">
 </head>
 <body>
 <div class="app-shell">
@@ -108,7 +108,11 @@
       </div>
       <p class="source-note bus-stops" id="bus-stops">—</p>
       <div id="bus-list" class="bus-list"></div>
-      <p class="source-note">只涵蓋九巴及龍運（同一官方 feed，含機場 A／E 線）；城巴、港鐵巴士未接入。</p>
+      <div class="nlb-block" id="nlb-block">
+        <div class="nlb-head"><span>口岸線</span><small>NLB 新大嶼山巴士</small></div>
+        <div id="nlb-list" class="nlb-list"></div>
+      </div>
+      <p class="source-note">九巴／龍運（官方 feed，含機場 A／E 線）＋ 新大嶼山巴士口岸線 B2／B2P；城巴、港鐵巴士未有公開實時 API。</p>
     </article>
     <article id="sources" class="rail-status panel">
       <div class="panel-head"><div><span class="eyebrow">DATA HEALTH</span><h2>資料來源狀態</h2></div></div>
@@ -156,5 +160,5 @@
 </footer>
 
 <nav class="mobile-nav" aria-label="主要功能"><a class="active" href="#home">⌂<span>首頁</span></a><a href="#rail">🚆<span>鐵路</span></a><a href="#traffic">🚗<span>道路</span></a><a href="#alerts">🔔<span>警報</span></a><a href="#sources">📡<span>來源</span></a></nav>
-</div>
+</div>
 </body></html>
