@@ -273,3 +273,14 @@
   .top-actions{gap:5px}
   .top-actions .icon-btn{min-width:32px;height:32px;font-size:14px;padding:0}
 }
+
+/* 輕鐵站增至 5 個：tab 與「其他站」卡自適應 */
+.lrt-tabs{grid-template-columns:repeat(auto-fit,minmax(70px,1fr))}
+.lrt-others{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+
+/* 手機版 5 個輕鐵 tab：一行橫向滑動，唔換行 */
+@media (max-width:700px){
+  .lrt-tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;padding-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .lrt-tabs::-webkit-scrollbar{display:none}
+  .lrt-tab{flex:0 0 76px}
+}

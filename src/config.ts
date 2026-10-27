@@ -103,7 +103,30 @@ export const LRT_GROUPS = [
       { id: '4B6D9BB197225DBE', name: '湖景邨湖畔樓 TM645', meters: 143 },
     ],
   },
-] as const;
+  {
+    station: '600',
+    name: '元朗',
+    routes: ['610', '614', '615', '761P'],
+    lat: 22.4456518,
+    lon: 114.0346405,
+    bus: [
+      { id: '4E2EC89B41600D7E', name: '形點 II YL395', meters: 116 },
+      { id: '723EF8D7809D3ADB', name: '形點 II YL392', meters: 122 },
+      { id: '0C943B7308FF4DCC', name: '形點 II YL390', meters: 131 },
+    ],
+  },
+  {
+    station: '100',
+    name: '兆康',
+    routes: ['505', '610', '614', '614P', '615', '615P', '751'],
+    lat: 22.4120102,
+    lon: 113.9782711,
+    bus: [
+      { id: '50DC968C90CE7CF4', name: '兆康站(南) TM910', meters: 184 },
+      { id: 'EC225F6F55BFA35E', name: '虎地 TM151', meters: 187 },
+      { id: '12CF2025741EF844', name: '麒麟圍 TM485', meters: 233 },
+    ],
+  },] as const;
 
 /* ------------------------------------------------------------------ 道路 */
 
