@@ -1,4 +1,4 @@
-import { isRecord, minutesFrom, optionalText, record, text } from '../lib/validate.ts';
+import { attempt, isRecord, minutesFrom, optionalText, record, text } from '../lib/validate.ts';
 import { parseHkDateTime } from '../lib/format.ts';
 import { getJson, type RequestOptions } from './client.ts';
 import type { Arrival, Direction, StationArrivals } from './types.ts';
@@ -28,17 +28,21 @@ function parseDirection(raw: unknown, dir: Direction, path: string): Arrival[] {
   for (let i = 0; i < entries.length; i += 1) {
     const entry = entries[i];
     if (!isRecord(entry)) continue;
-    if (text(entry['valid'], `${path}[${i}].valid`) === 'N') continue;
-    const minutes = minutesFrom(entry['ttnt']);
-    if (minutes === null) continue;
-    const destCode = text(entry['dest'], `${path}[${i}].dest`);
-    out.push({
-      dir,
-      destCode,
-      destLabel: destLabel(destCode),
-      platform: text(entry['plat'], `${path}[${i}].plat`),
-      minutes,
-    });
+    // 逐班獨立解析：壞一班唔會令整個方向消失。
+    const arrival = attempt<Arrival | null>(() => {
+      if (text(entry['valid'], `${path}[${i}].valid`) === 'N') return null;
+      const minutes = minutesFrom(entry['ttnt']);
+      if (minutes === null) return null;
+      const destCode = text(entry['dest'], `${path}[${i}].dest`);
+      return {
+        dir,
+        destCode,
+        destLabel: destLabel(destCode),
+        platform: text(entry['plat'], `${path}[${i}].plat`),
+        minutes,
+      };
+    }, null);
+    if (arrival) out.push(arrival);
   }
   out.sort((a, b) => a.minutes - b.minutes);
   // 同一目的地只留最近一班，避免「往屯門 0 / 往屯門 0」重複。

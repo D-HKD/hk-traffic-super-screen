@@ -1,4 +1,4 @@
-import { isRecord, minutesFrom, numberOrNull, text } from '../lib/validate.ts';
+import { attempt, isRecord, minutesFrom, numberOrNull, text } from '../lib/validate.ts';
 import type { RequestOptions } from './client.ts';
 import { getJson } from './client.ts';
 import type { LrtRow } from './types.ts';
@@ -22,27 +22,31 @@ export function parseLrtSchedule(payload: unknown, group: (typeof LRT_GROUPS)[nu
   const rows: LrtRow[] = [];
   for (const platform of platforms) {
     if (!isRecord(platform)) continue;
-    const platformId = text(platform['platform_id'], 'platform_id');
+    const platformId = attempt(() => text(platform['platform_id'], 'platform_id'), '');
     const routeList = platform['route_list'];
     if (!Array.isArray(routeList)) continue;
 
     for (const raw of routeList) {
       if (!isRecord(raw)) continue;
-      const route = text(raw['route_no'], 'route_no');
-      if (!(group.routes as readonly string[]).includes(route)) continue;
-      const minutes = minutesFrom(raw['time_ch']);
-      if (minutes === null) continue;
-      // train_length 由官方直接提供：1 = 單卡，2 = 雙卡。缺失就留 null，寧願唔顯示都唔好亂猜。
-      const length = numberOrNull(raw['train_length']);
-      const cars: 1 | 2 | null = length === null ? null : length >= 2 ? 2 : 1;
-      rows.push({
-        route,
-        dest: text(raw['dest_ch'], 'dest_ch') || text(raw['dest_en'], 'dest_en'),
-        platform: platformId,
-        minutes,
-        station: group.station,
-        cars,
-      });
+      // 逐班車獨立解析：某一班格式異常只跳過嗰班，其餘照出。
+      const built = attempt<LrtRow | null>(() => {
+        const route = text(raw['route_no'], 'route_no');
+        if (!(group.routes as readonly string[]).includes(route)) return null;
+        const minutes = minutesFrom(raw['time_ch']);
+        if (minutes === null) return null;
+        // train_length 由官方直接提供：1 = 單卡，2 = 雙卡。缺失就留 null，寧願唔顯示都唔好亂猜。
+        const length = numberOrNull(raw['train_length']);
+        const cars: 1 | 2 | null = length === null ? null : length >= 2 ? 2 : 1;
+        return {
+          route,
+          dest: text(raw['dest_ch'], 'dest_ch') || text(raw['dest_en'], 'dest_en'),
+          platform: platformId,
+          minutes,
+          station: group.station,
+          cars,
+        };
+      }, null);
+      if (built) rows.push(built);
     }
   }
 

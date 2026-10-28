@@ -1,5 +1,5 @@
 import type { BusArrival } from './types.ts';
-import { isRecord, numberOrNull, optionalText, record } from '../lib/validate.ts';
+import { attempt, isRecord, numberOrNull, optionalText, record } from '../lib/validate.ts';
 import { HttpError, getJson, type RequestOptions } from './client.ts';
 
 /**
@@ -67,22 +67,26 @@ export function parseStopEta(payload: unknown, stop: { id: string; name: string 
 
   const rows: BusArrival[] = [];
   for (const entry of data) {
-    if (!isRecord(entry)) continue;
-    const route = optionalText(entry['route'], 'route');
-    const eta = optionalText(entry['eta'], 'eta');
-    if (!route || !eta) continue;
-    const minutes = minutesUntil(eta, now);
-    if (minutes === null) continue;
-    const seq = numberOrNull(entry['eta_seq']);
-    if (seq !== null && seq > 1) continue;
-    rows.push({
-      route,
-      dest: optionalText(entry['dest_tc'], 'dest_tc') ?? '',
-      minutes,
-      stop: stop.name,
-      stopId: stop.id,
-      operator: optionalText(entry['co'], 'co') ?? 'KMB',
-    });
+    // 逐班獨立解析：某一班格式異常只跳過嗰班，唔會令整條路線消失。
+    const row = attempt<BusArrival | null>(() => {
+      if (!isRecord(entry)) return null;
+      const route = optionalText(entry['route'], 'route');
+      const eta = optionalText(entry['eta'], 'eta');
+      if (!route || !eta) return null;
+      const minutes = minutesUntil(eta, now);
+      if (minutes === null) return null;
+      const seq = numberOrNull(entry['eta_seq']);
+      if (seq !== null && seq > 1) return null;
+      return {
+        route,
+        dest: optionalText(entry['dest_tc'], 'dest_tc') ?? '',
+        minutes,
+        stop: stop.name,
+        stopId: stop.id,
+        operator: optionalText(entry['co'], 'co') ?? 'KMB',
+      };
+    }, null);
+    if (row) rows.push(row);
   }
 
   rows.sort((a, b) => a.minutes - b.minutes);
@@ -127,7 +131,8 @@ export async function fetchBusArrivals(
   for (const stop of stops) {
     const rows = payload[stop.id];
     if (rows === undefined) continue;
-    merged.push(...parseStopEta(rows, stop, now));
+    // 每個站獨立：某一個站回應壞掉，唔會令其他站都消失。
+    merged.push(...attempt(() => parseStopEta(rows, stop, now), [] as BusArrival[]));
   }
 
   merged.sort((a, b) => a.minutes - b.minutes);
