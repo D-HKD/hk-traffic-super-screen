@@ -1,6 +1,7 @@
 import { isRecord, numberOrNull, optionalText, record, text } from '../lib/validate';
 import { parseHkDateTime } from '../lib/format';
 import { nearestHkoStation } from '../core/geo';
+import { textOrJoined } from '../core/hko.ts';
 import type { RequestOptions } from './client';
 import { getJson } from './client';
 import type { WeatherReading } from './types';
@@ -15,7 +16,6 @@ function readings(payload: unknown, key: string): Record<string, unknown>[] {
   if (!Array.isArray(data)) return [];
   return data.filter(isRecord);
 }
-
 function pickByPlace(list: readonly Record<string, unknown>[], wanted: string | null): Record<string, unknown> | undefined {
   if (wanted) {
     const hit = list.find((row) => text(row['place'], 'place').includes(wanted));
@@ -57,8 +57,8 @@ export function parseWeather(payload: unknown, preferredStation: string | null):
   const uvRow = uvs[0];
   const uvDesc = uvRow ? text(uvRow['desc'], 'desc') || null : null;
 
-  const warning = optionalText(root['warningMessage'], 'warningMessage') ?? null;
-  const tip = optionalText(root['tcmessage'], 'tcmessage') ?? null;
+  const warning = textOrJoined(root['warningMessage']);
+  const tip = textOrJoined(root['tcmessage']);
   const observedRaw = optionalText(root['updateTime'], 'updateTime');
 
   return {
