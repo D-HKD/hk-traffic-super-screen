@@ -198,6 +198,8 @@ interface CapacitorCoords {
 }
 
 interface CapacitorGeolocation {
+  /** 明確請求 Android runtime 權限（會彈系統對話框）。 */
+  requestPermissions?(): Promise<{ location?: string; coarseLocation?: string }>;
   getCurrentPosition(options?: { enableHighAccuracy?: boolean; timeout?: number }): Promise<{ coords: CapacitorCoords }>;
 }
 
@@ -247,8 +249,9 @@ function requestGps(silent = false): void {
 
   const native = nativeGeolocation();
   if (native) {
-    native
-      .getCurrentPosition({ enableHighAccuracy: true, timeout: 15000 })
+    // 先明確請求權限（Android 系統對話框），再取位置。
+    Promise.resolve(native.requestPermissions ? native.requestPermissions() : undefined)
+      .then(() => native.getCurrentPosition({ enableHighAccuracy: true, timeout: 15000 }))
       .then((position) => applyFix(position.coords, silent))
       .catch((error: unknown) => applyGpsError(error as { message?: string }, silent));
     return;
