@@ -4,19 +4,26 @@
 
 ![預覽](preview.png)
 
-## 設計
+## 設計：路線 ＋ 站點
 
-沿用網站本身的品牌語言，不是另創一套：
+![概念比較](concepts.png)
 
-| 元素 | 取自 |
+| 元素 | 意思 |
 |---|---|
+| 青色圓頭折線 | 屯馬綫／輕鐵路網（三個轉角＝路線轉向） |
+| 白色圓點＋深色外環 | 車站 |
+| 背後淡白斜線 | 道路，暗示範圍不只鐵路 |
 | 深藍底 `#0a1d30 → #040b14` | 網站 `--bg` / `--panel` |
-| 青→紫四角星 `#32dcff → #8f7bff` | `icon.svg` 的 `mark` 漸變 |
-| 中央深色圓 + 青點 | `.brand-mark` 標記 |
-| 左上青色光暈 + 極淡斜向路網 | 頁首 `radial-gradient` 與道路意象 |
+| 左上青色光暈 | 頁首 radial-gradient |
+| 內框 `#1b6d92` | 網站卡片邊線 |
 
-星形比例直接跟 `icon.svg` 的路徑：尖端半徑 `R`、凹位半徑 `0.34R`，兩者成 45°，
-所以縮到 48px 仍然是清晰的四角星，不會糊成一團。
+配色取自網站 CSS 變數（`--cyan #32dcff`、`--cyan2 #11a9ee`），
+所以 App 圖示與網頁是同一個視覺家族。
+
+縮到 48px 仍見到「路線＋兩個站」，唔會糊成一團。
+
+> 曾經試過四角星（網站 `.brand-mark` 的形狀），但使用者要求非星形，
+> 最終採用路線＋站點。`concepts.png` 保留三個概念作記錄。
 
 ## 檔案
 
@@ -39,34 +46,38 @@ android-icons/
 
 ## 放入 Android Studio
 
-1. 把 `mipmap-*`、`drawable`、`values`、`mipmap-anydpi-v26` 全部複製到
+1. 把 `mipmap-*`、`drawable`、`values`、`mipmap-anydpi-v26` 複製到
    `app/src/main/res/` 之下（同名資料夾合併）
-2. `AndroidManifest.xml` 的 `<application>` 確認：
+2. `AndroidManifest.xml` 的 `<application>`：
 
 ```xml
 android:icon="@mipmap/ic_launcher"
 android:roundIcon="@mipmap/ic_launcher_round"
 ```
 
-3. Adaptive icon 已經處理安全區：前景內容約佔 52%，系統用 66dp 安全區裁形時
-   不會切到星角。圓形、方形、水滴形都會自動適應。
-4. `monochrome` 已指向同一個前景，Android 13+ 主題圖示（Material You）可用。
+3. Adaptive icon 已預留安全區：前景圖案約佔 52%，系統用 66dp 安全區裁形時
+   不會切到線頭或站點。圓形、方形、水滴形都會自動適應。
+4. `monochrome` 指向同一前景，Android 13+ 主題圖示（Material You）可用。
 
 ## 重新生成
-
-改顏色或星形比例，改 `tools/make-android-icons.py` 頂部的常數，然後：
 
 ```bash
 python tools/make-android-icons.py
 ```
 
-需要 Pillow。所有尺寸、XML、Play Store 圖、預覽圖會一次過重出。
+改 `ROUTE`（路線轉角）、`STATIONS`（站點位置）、`CYAN` 等常數即可。
+需要 Pillow。
+
+只畫概念草圖：
+
+```bash
+python tools/icon-concepts.py     # 路線／徽章／列車 三個方向
+```
 
 ## 如果要做成 APK
 
-最簡單是用 **TWA（Trusted Web Activity）** 包裝現有網站：
+用 **TWA（Trusted Web Activity）** 包裝現有網站：
 
-- 用 [PWABuilder](https://www.pwabuilder.com/) 或 `bubblewrap init --manifest
-  https://d-hkd.github.io/hk-traffic-super-screen/manifest.webmanifest`
-- 直接沿用本資料夾的 icon（PWABuilder 亦可自動生成，但會是預設樣式）
-- TWA 需要 `assetlinks.json` 放在 `docs/.well-known/` 之下
+- `bubblewrap init --manifest https://d-hkd.github.io/hk-traffic-super-screen/manifest.webmanifest`
+- 用本資料夾的 icon 覆蓋 `res/mipmap-*`
+- 需要 `docs/.well-known/assetlinks.json`，否則網址欄會顯示
