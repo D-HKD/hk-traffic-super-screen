@@ -190,51 +190,82 @@ function surfaceAlert(item: TrafficItem): void {
 
 /* ---------------------------------------------------------------- 動作 */
 
+/** Capacitor 原生定位外掛（APK 內使用，會彈 Android 系統權限對話框）。 */
+interface CapacitorCoords {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+}
+
+interface CapacitorGeolocation {
+  getCurrentPosition(options?: { enableHighAccuracy?: boolean; timeout?: number }): Promise<{ coords: CapacitorCoords }>;
+}
+
+function nativeGeolocation(): CapacitorGeolocation | null {
+  const bridge = (globalThis as unknown as {
+    Capacitor?: { Plugins?: { Geolocation?: CapacitorGeolocation } };
+  }).Capacitor;
+  const plugin = bridge?.Plugins?.Geolocation;
+  return plugin && typeof plugin.getCurrentPosition === 'function' ? plugin : null;
+}
+
+function applyFix(coords: CapacitorCoords, silent: boolean): void {
+  store.update({
+    gps: {
+      status: 'ok',
+      lat: coords.latitude,
+      lon: coords.longitude,
+      accuracyM: coords.accuracy,
+      at: new Date(),
+    },
+  });
+  scheduler?.refresh('weather');
+
+  // 用真實座標切換到最近的輕鐵站（同時帶動巴士面板）。
+  const nearest = nearestLrtStation({ lat: coords.latitude, lon: coords.longitude });
+  if (nearest.km < 3) selectLrtStation(nearest.station.code, true);
+
+  if (!silent) chrome?.toast('已定位', `±${Math.round(coords.accuracy)} 米`);
+}
+
+function applyGpsError(error: { message?: string }, silent: boolean): void {
+  if (silent) return;
+  store.update({ gps: { status: 'denied', lat: null, lon: null, accuracyM: null, at: null } });
+  chrome?.toast('定位失敗', error.message ?? '未能取得位置');
+}
+
+/**
+ * 取得位置。
+ *
+ * APK（Capacitor）內優先用原生外掛：Android WebView 的 navigator.geolocation
+ * 需要 host app 實作權限回呼，經常靜靜失敗；原生外掛會直接彈系統權限框。
+ * 瀏覽器內則照舊用 Web Geolocation API。
+ */
 function requestGps(silent = false): void {
+  const current = store.get().gps;
+  store.update({ gps: { ...current, status: 'locating' } });
+
+  const native = nativeGeolocation();
+  if (native) {
+    native
+      .getCurrentPosition({ enableHighAccuracy: true, timeout: 15000 })
+      .then((position) => applyFix(position.coords, silent))
+      .catch((error: unknown) => applyGpsError(error as { message?: string }, silent));
+    return;
+  }
+
   if (!('geolocation' in navigator)) {
     store.update({ gps: { status: 'unsupported', lat: null, lon: null, accuracyM: null, at: null } });
     chrome?.toast('此裝置不支援定位');
     return;
   }
 
-  const current = store.get().gps;
-  store.update({ gps: { ...current, status: 'locating' } });
-
   navigator.geolocation.getCurrentPosition(
-    (position) => {
-      store.update({
-        gps: {
-          status: 'ok',
-          lat: position.coords.latitude,
-          lon: position.coords.longitude,
-          accuracyM: position.coords.accuracy,
-          at: new Date(),
-        },
-      });
-      scheduler?.refresh('weather');
-
-      // 用真實座標切換到最近的輕鐵站（同時帶動巴士面板）。
-      const nearest = nearestLrtStation({ lat: position.coords.latitude, lon: position.coords.longitude });
-      if (nearest.km < 3) selectLrtStation(nearest.station.code, true);
-
-      chrome?.toast('已定位', `±${Math.round(position.coords.accuracy)} 米`);
-    },
-    (error) => {
-      if (silent) return;
-      store.update({ gps: { status: 'denied', lat: null, lon: null, accuracyM: null, at: null } });
-      chrome?.toast('定位失敗', error.message);
-    },
+    (position) => applyFix(position.coords, silent),
+    (error) => applyGpsError(error, silent),
     { enableHighAccuracy: true, timeout: 8000, maximumAge: 60_000 },
   );
 }
-
-
-/**
- * 靜靜更新定位。
- *
- * 只在「權限已係 granted」時才呼叫：iOS Safari 未授權時，程式化定位會彈提示框，
- * 每次開頁面都彈一次好騷擾，所以寧願保留上次座標，等用戶自己按掣。
- */
 function maybeSilentRefresh(): void {
   const permissions = navigator.permissions;
   if (!permissions || typeof permissions.query !== 'function') return;

@@ -1,0 +1,63 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android-app/**'
+      - 'docs/**'
+      - '.github/workflows/android.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install Capacitor dependencies
+        working-directory: android-app
+        run: npm install --no-audit --no-fund
+
+      - name: Copy built site into www
+        run: |
+          rm -rf android-app/www
+          mkdir -p android-app/www
+          cp -r docs/. android-app/www/
+          rm -f android-app/www/_*.png \
+                android-app/www/bus-panel.png \
+                android-app/www/lrt-panel.png \
+                android-app/www/roads-panel.png \
+                android-app/www/tml-panel.png \
+                android-app/www/nlb-panel.png \
+                android-app/www/live-site.png \
+                android-app/www/screenshot-desktop.png \
+                android-app/www/screenshot-mobile.png
+
+      - name: Sync Capacitor
+        working-directory: android-app
+        run: npx cap sync android
+
+      - name: Build debug APK
+        working-directory: android-app/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: traffic-screen-debug-apk
+          path: android-app/android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error

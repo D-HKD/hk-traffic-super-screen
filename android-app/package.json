@@ -1,0 +1,17 @@
+{
+  "name": "hk-traffic-super-screen-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "香港交通警報中心 — Capacitor Android 包裝（原生定位）",
+  "scripts": {
+    "sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/geolocation": "^6.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0"
+  }
+}

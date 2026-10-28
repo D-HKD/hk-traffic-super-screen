@@ -5,3 +5,14 @@ dist/
 .env.*.local
 *.log
 .DS_Store
+
+# Capacitor / Android 建置產物（不需要入 repo）
+android-app/node_modules/
+android-app/www/
+android-app/android/.gradle/
+android-app/android/build/
+android-app/android/app/build/
+android-app/android/local.properties
+android-app/android/.idea/android-app/android/app/src/main/assets/public/
+android-app/android/app/src/main/assets/capacitor.config.json
+android-app/android/app/src/main/assets/capacitor.plugins.json

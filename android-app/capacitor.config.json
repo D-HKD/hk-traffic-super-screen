@@ -1,0 +1,9 @@
+{
+  "appId": "com.dhkd.trafficscreen",
+  "appName": "香港交通警報中心",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#06111f"
+  }
+}
