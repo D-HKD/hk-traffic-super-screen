@@ -100,7 +100,7 @@ export interface TrafficItem {
   readonly msgState: MessageState;
 }
 
-export type GpsStatus = 'idle' | 'locating' | 'ok' | 'denied' | 'unsupported';
+export type GpsStatus = 'idle' | 'locating' | 'ok' | 'denied' | 'unsupported' | 'cached';
 
 export interface GpsState {
   readonly status: GpsStatus;

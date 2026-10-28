@@ -7,6 +7,7 @@ const STATUS_TEXT: Readonly<Record<GpsState['status'], string>> = {
   idle: '未啟用',
   locating: '定位中…',
   ok: '已定位',
+  cached: '上次定位',
   denied: '未授權定位',
   unsupported: '此裝置不支援定位',
 };
@@ -20,7 +21,7 @@ export function renderLocation(gps: GpsState): void {
       byId('gps-detail'),
       gps.status === 'denied'
         ? '瀏覽器封鎖了定位；可在網站設定重新允許'
-        : '按右上角 ⌖ 只用一次定位',
+        : '按下方「用我位置」或右上角 ⌖ 定位一次',
     );
     setText(byId('loc-station'), '--');
     setText(byId('loc-distance'), '--');

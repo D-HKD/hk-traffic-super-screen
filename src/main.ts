@@ -7,7 +7,7 @@ import { fetchPortArrivals } from './api/port';
 import { fetchLrtStations } from './api/lrt';
 import { PartialFailureError, TML_CODES, fetchTmlBatch } from './api/mtr';
 import { fetchTrafficNews } from './api/traffic';
-import { idleSlice, type AlertFilter, type AppState, type ConnState, type Slice, type TrafficItem } from './api/types';
+import { idleSlice, type AlertFilter, type AppState, type ConnState, type GpsState, type Slice, type TrafficItem } from './api/types';
 import { fetchRoadSpeeds } from './api/roads';
 import { fetchWeather } from './api/weather';
 import { SEVERITY_LABEL, roadStatuses, sortByNewest } from './core/messages';
@@ -31,10 +31,25 @@ import { registerServiceWorker } from './pwa';
 
 const PREF_KEY = 'hk-traffic-v2-prefs';
 
+interface LastFix {
+  lat: number;
+  lon: number;
+  /** 毫秒時間戳 */
+  at: number;
+}
+
 interface Prefs {
   night: boolean;
   favorites: string[];
   lrtStation: string;
+  /**
+   * 上次成功定位嘅座標。
+   *
+   * iPhone Safari 重新開網頁時唔會記得上次位置，而地理位置權限又一定要用戶手勢先問。
+   * 所以我們自己記住上次座標：開頁面即刻可以顯示「上次定位」，唔需要再按掣；
+   * 如果權限仍然有效，就會在背景靜靜更新。
+   */
+  lastFix: LastFix | null;
 }
 
 const DEFAULT_LRT_STATION = '500';
@@ -46,12 +61,30 @@ function migrateStation(value: string): string {
   return byName?.code ?? DEFAULT_LRT_STATION;
 }
 
+function readLastFix(record: Record<string, unknown>): LastFix | null {
+  const raw = record['lastFix'];
+  if (typeof raw !== 'object' || raw === null) return null;
+  const fix = raw as Record<string, unknown>;
+  const lat = fix['lat'];
+  const lon = fix['lon'];
+  const at = fix['at'];
+  if (typeof lat !== 'number' || typeof lon !== 'number' || typeof at !== 'number') return null;
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  // 超過 24 小時當作過期，避免用很久以前的座標誤導。
+  if (Date.now() - at > 24 * 60 * 60 * 1000) return null;
+  return { lat, lon, at };
+}
+
+function emptyPrefs(): Prefs {
+  return { night: false, favorites: [], lrtStation: DEFAULT_LRT_STATION, lastFix: null };
+}
+
 function loadPrefs(): Prefs {
   try {
     const raw = localStorage.getItem(PREF_KEY);
-    if (!raw) return { night: false, favorites: [], lrtStation: DEFAULT_LRT_STATION };
+    if (!raw) return emptyPrefs();
     const parsed: unknown = JSON.parse(raw);
-    if (typeof parsed !== 'object' || parsed === null) return { night: false, favorites: [], lrtStation: DEFAULT_LRT_STATION };
+    if (typeof parsed !== 'object' || parsed === null) return emptyPrefs();
     const record = parsed as Record<string, unknown>;
     const favorites = Array.isArray(record['favorites'])
       ? record['favorites'].filter((code): code is string => typeof code === 'string')
@@ -60,17 +93,23 @@ function loadPrefs(): Prefs {
       night: record['night'] === true,
       favorites,
       lrtStation: migrateStation(typeof record['lrtStation'] === 'string' ? record['lrtStation'] : DEFAULT_LRT_STATION),
+      lastFix: readLastFix(record),
     };
   } catch {
-    return { night: false, favorites: [], lrtStation: DEFAULT_LRT_STATION };
+    return emptyPrefs();
   }
 }
 
+/** 只有真正有座標（ok 或 cached）才寫入 lastFix。 */
+function lastFixOf(gps: GpsState): LastFix | null {
+  if (gps.lat === null || gps.lon === null) return null;
+  return { lat: gps.lat, lon: gps.lon, at: (gps.at ?? new Date()).getTime() };
+}
 function savePrefs(state: AppState): void {
   try {
     localStorage.setItem(
       PREF_KEY,
-      JSON.stringify({ night: state.ui.night, favorites: state.ui.favorites, lrtStation: state.ui.lrtStation }),
+      JSON.stringify({ night: state.ui.night, favorites: state.ui.favorites, lrtStation: state.ui.lrtStation, lastFix: lastFixOf(state.gps) }),
     );
   } catch {
     /* 私密模式可能不允許寫入，忽略即可 */
@@ -90,7 +129,15 @@ const store = createStore<AppState>({
   roads: idleSlice(),
   weather: idleSlice(),
   traffic: idleSlice(),
-  gps: { status: 'idle', lat: null, lon: null, accuracyM: null, at: null },
+  gps: prefs.lastFix
+    ? {
+        status: 'cached',
+        lat: prefs.lastFix.lat,
+        lon: prefs.lastFix.lon,
+        accuracyM: null,
+        at: new Date(prefs.lastFix.at),
+      }
+    : { status: 'idle', lat: null, lon: null, accuracyM: null, at: null },
   ui: { night: prefs.night, filter: 'all', favorites: prefs.favorites, lrtStation: prefs.lrtStation, busStop: 'auto' },
 });
 
@@ -141,7 +188,7 @@ function surfaceAlert(item: TrafficItem): void {
 
 /* ---------------------------------------------------------------- 動作 */
 
-function requestGps(): void {
+function requestGps(silent = false): void {
   if (!('geolocation' in navigator)) {
     store.update({ gps: { status: 'unsupported', lat: null, lon: null, accuracyM: null, at: null } });
     chrome?.toast('此裝置不支援定位');
@@ -171,6 +218,7 @@ function requestGps(): void {
       chrome?.toast('已定位', `±${Math.round(position.coords.accuracy)} 米`);
     },
     (error) => {
+      if (silent) return;
       store.update({ gps: { status: 'denied', lat: null, lon: null, accuracyM: null, at: null } });
       chrome?.toast('定位失敗', error.message);
     },
@@ -178,6 +226,25 @@ function requestGps(): void {
   );
 }
 
+
+/**
+ * 靜靜更新定位。
+ *
+ * 只在「權限已係 granted」時才呼叫：iOS Safari 未授權時，程式化定位會彈提示框，
+ * 每次開頁面都彈一次好騷擾，所以寧願保留上次座標，等用戶自己按掣。
+ */
+function maybeSilentRefresh(): void {
+  const permissions = navigator.permissions;
+  if (!permissions || typeof permissions.query !== 'function') return;
+  permissions
+    .query({ name: 'geolocation' as PermissionName })
+    .then((status) => {
+      if (status.state === 'granted') requestGps(true);
+    })
+    .catch(() => {
+      /* 舊版 Safari 唔支援查詢 geolocation 權限，忽略即可 */
+    });
+}
 function setNight(value: boolean): void {
   const state = store.get();
   store.update({ ui: { ...state.ui, night: value } });
@@ -527,6 +594,18 @@ bindActions();
 initLrtPicker({ selectLrtStation });
 initBusPicker({ selectBusStop });
 chrome.setNight(prefs.night);
+
+// 位置：上次座標會即刻顯示；若權限仍有效，背景靜靜更新（唔會彈提示）。
+const fixAge = prefs.lastFix ? Date.now() - prefs.lastFix.at : Number.POSITIVE_INFINITY;
+if (fixAge > 5 * 60_000) window.setTimeout(maybeSilentRefresh, 1200);
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  const at = store.get().gps.at?.getTime() ?? 0;
+  if (Date.now() - at > 5 * 60_000) maybeSilentRefresh();
+});
+
+on(byId('gps-panel-btn'), 'click', () => requestGps());
 
 void currentPushState().then((state) => {
   chrome?.setNotify(state === 'subscribed' ? 'on' : state === 'denied' ? 'blocked' : 'off');

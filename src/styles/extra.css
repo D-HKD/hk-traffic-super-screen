@@ -313,3 +313,39 @@
     outline-offset:2px;
   }
 }
+
+/* ── iPhone 瀏海／狀態欄安全區 ─────────────────────────────────────────
+   base.css 在 ≤1100px 把 .top-actions 設成 position:absolute; top:10px;
+   因為 .top 冇 position，佢會相對「viewport」定位 —— 正好貼在 iPhone 狀態欄／
+   瀏海下面，直向時撳唔到（橫向狀態欄變窄就撳到）。以下修正：
+   1. 讓 .app-shell 讓出安全區
+   2. 讓 .top 成為定位容器，並把安全區計入 offset
+   ─────────────────────────────────────────────────────────────────── */
+.app-shell{
+  padding-top:calc(14px + env(safe-area-inset-top));
+  padding-left:calc(16px + env(safe-area-inset-left));
+  padding-right:calc(16px + env(safe-area-inset-right));
+}
+
+@media (max-width:1100px){
+  .app-shell{
+    padding-top:calc(10px + env(safe-area-inset-top));
+    padding-left:calc(11px + env(safe-area-inset-left));
+    padding-right:calc(11px + env(safe-area-inset-right));
+    padding-bottom:calc(78px + env(safe-area-inset-bottom));
+  }
+  .top{position:relative}
+  .top-actions{
+    right:calc(6px + env(safe-area-inset-right));
+    top:calc(6px + env(safe-area-inset-top));
+  }
+}
+
+/* 位置卡：兩個大掣並排；「用我位置」用主色，手指最易撳 */
+.loc-actions{display:grid;gap:8px;margin-top:8px}
+@media (min-width:520px){.loc-actions{grid-template-columns:1fr 1fr}}
+.loc-gps-btn{
+  border-color:rgba(50,220,255,.62);
+  background:linear-gradient(145deg,rgba(16,78,110,.95),rgba(8,32,50,.95));
+  color:var(--text);font-weight:600;min-height:44px;
+}
