@@ -1,6 +1,6 @@
-import type { AppState } from '../api/types';
-import { TML_STATIONS } from '../api/mtr';
-import { byId, h, replace } from '../lib/dom';
+import type { AppState } from '../api/types.ts';
+import { TML_STATIONS } from '../api/mtr.ts';
+import { byId, h, replace } from '../lib/dom.ts';
 
 function nextArrival(state: AppState, code: string): number | null {
   const station = state.tml.data?.[code];

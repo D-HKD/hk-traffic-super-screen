@@ -1,7 +1,7 @@
-import type { GpsState } from '../api/types';
-import { nearestHkoStation, nearestTmlStation } from '../core/geo';
-import { byId, setText } from '../lib/dom';
-import { clockText, distanceText } from '../lib/format';
+import type { GpsState } from '../api/types.ts';
+import { nearestHkoStation, nearestTmlStation } from '../core/geo.ts';
+import { byId, setText } from '../lib/dom.ts';
+import { clockText, distanceText } from '../lib/format.ts';
 
 const STATUS_TEXT: Readonly<Record<GpsState['status'], string>> = {
   idle: '未啟用',

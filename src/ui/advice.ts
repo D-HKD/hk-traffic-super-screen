@@ -1,8 +1,8 @@
-import type { AppState, Severity } from '../api/types';
-import { computeAdvice, type Advice } from '../core/advice';
-import { byId, setText } from '../lib/dom';
-import type { Chrome } from './chrome';
-import { relevantItems } from './roads';
+import type { AppState, Severity } from '../api/types.ts';
+import { computeAdvice, type Advice } from '../core/advice.ts';
+import { byId, setText } from '../lib/dom.ts';
+import type { Chrome } from './chrome.ts';
+import { relevantItems } from './roads.ts';
 
 let lastAdvice: Advice | null = null;
 

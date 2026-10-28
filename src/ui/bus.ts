@@ -1,10 +1,10 @@
-import type { AppState, PortArrival } from '../api/types';
-import { loadBusStops } from '../api/bus';
-import { groupByStop } from '../core/bus';
-import { busStopsFor, stationName } from '../core/places';
-import { walkLabel, walkMinutes } from '../core/walk';
-import { byId, h, on, replace, setText } from '../lib/dom';
-import { agoText, etaText, freshness } from '../lib/format';
+import type { AppState, PortArrival } from '../api/types.ts';
+import { loadBusStops } from '../api/bus.ts';
+import { groupByStop } from '../core/bus.ts';
+import { busStopsFor, stationName } from '../core/places.ts';
+import { walkLabel, walkMinutes } from '../core/walk.ts';
+import { byId, h, on, replace, setText } from '../lib/dom.ts';
+import { agoText, etaText, freshness } from '../lib/format.ts';
 
 const STALE_MS = 3 * 60_000;
 const DEAD_MS = 20 * 60_000;

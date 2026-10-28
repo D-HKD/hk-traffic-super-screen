@@ -1,5 +1,5 @@
-import type { Slice, WeatherReading } from '../api/types';
-import { byId, setText } from '../lib/dom';
+import type { Slice, WeatherReading } from '../api/types.ts';
+import { byId, setText } from '../lib/dom.ts';
 
 /**
  * 天氣只出現在頁首（溫度、濕度、粗略圖示），避免同一組數字在頁面出現兩次。
@@ -35,10 +35,17 @@ export function renderWeather(slice: Slice<WeatherReading>, now: Date): void {
   // 避免頁首長年掛住「較舊」兩個字反而令人忽略真正過時的情況。
   const observed = reading?.observedAt ?? null;
   const tooOld = observed !== null && now.getTime() - observed.getTime() > FAR_STALE_MS;
-  setText(
-    byId('header-weather'),
-    reading ? `${reading.station}觀測${tooOld ? '・資料過時' : ''}` : slice.state === 'error' ? '天氣更新失敗' : '未取得天氣',
-  );
+  const issues = reading?.issues ?? [];
+  const base = reading
+    ? `${reading.station}觀測${tooOld ? '・資料過時' : ''}`
+    : slice.state === 'error'
+      ? '天氣更新失敗'
+      : '未取得天氣';
+  const label = issues.length > 0 ? `${base}・部分欄位異常` : base;
+  setText(byId('header-weather'), label);
+  // 唔會靜靜雞當冇事：講明邊個欄位壞、已略過。
+  byId('header-weather').title =
+    issues.length > 0 ? `以下欄位格式異常，已略過：${issues.join('、')}` : '';
 
   const warningBtn = byId<HTMLButtonElement>('header-warning');
   if (reading?.warning) {

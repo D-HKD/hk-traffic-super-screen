@@ -75,3 +75,19 @@ function describe(value: unknown): string {
   if (Array.isArray(value)) return `陣列(${value.length})`;
   return typeof value;
 }
+
+/**
+ * 逐個欄位獨立解析：某一個欄位壞咗，唔好拖死整份資料。
+ *
+ * 外部 API（例如天文台）的欄位型別會變，嚴格驗證本身冇錯，但應該係
+ * 「壞邊個當邊個冇」，而唔係「一個壞 → 全部冇」。失敗時把欄位名記入 issues，
+ * 令 UI 可以如實標示「部分欄位異常」，而唔會靜靜雞當冇事。
+ */
+export function attempt<T>(fn: () => T, fallback: T, issues?: string[], label?: string): T {
+  try {
+    return fn();
+  } catch {
+    if (issues && label) issues.push(label);
+    return fallback;
+  }
+}

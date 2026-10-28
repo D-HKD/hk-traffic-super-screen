@@ -1,6 +1,6 @@
-import type { BusArrival } from './types';
-import { isRecord, numberOrNull, optionalText, record } from '../lib/validate';
-import { HttpError, getJson, type RequestOptions } from './client';
+import type { BusArrival } from './types.ts';
+import { isRecord, numberOrNull, optionalText, record } from '../lib/validate.ts';
+import { HttpError, getJson, type RequestOptions } from './client.ts';
 
 /**
  * 九巴（KMB）到站資料。

@@ -1,16 +1,16 @@
-import { isRecord, minutesFrom, numberOrNull, text } from '../lib/validate';
-import type { RequestOptions } from './client';
-import { getJson } from './client';
-import type { LrtRow } from './types';
+import { isRecord, minutesFrom, numberOrNull, text } from '../lib/validate.ts';
+import type { RequestOptions } from './client.ts';
+import { getJson } from './client.ts';
+import type { LrtRow } from './types.ts';
 
 /**
  * 輕鐵站同該站要顯示的路線。舊版把「該站所有路線」直接列出，
  * 會出現同一路線往唔同目的地重複佔位；這裡先按路線白名單過濾再按目的地去重。
  */
-export { LRT_GROUPS } from '../config';
+export { LRT_GROUPS } from '../config.ts';
 
-import { LRT_GROUPS } from '../config';
-import { settleAll } from '../lib/promise';
+import { LRT_GROUPS } from '../config.ts';
+import { settleAll } from '../lib/promise.ts';
 
 const MAX_ROWS = 8;
 

@@ -1,6 +1,6 @@
-import type { RoadDirectionSpeed, RoadSnapshot, RoadSpeed } from './types';
-import { HttpError, getJson, type RequestOptions } from './client';
-import { isRecord, numberOrNull, optionalText, record, text } from '../lib/validate';
+import type { RoadDirectionSpeed, RoadSnapshot, RoadSpeed } from './types.ts';
+import { HttpError, getJson, type RequestOptions } from './client.ts';
+import { isRecord, numberOrNull, optionalText, record, text } from '../lib/validate.ts';
 
 /** Worker 已把 709KB 的原始 feed 濃縮成 4 條路；前端只需要驗證再用。 */
 export function parseRoadSnapshot(payload: unknown): RoadSnapshot {

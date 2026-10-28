@@ -1,7 +1,7 @@
-import type { PortArrival } from './types';
-import { array, isRecord, record } from '../lib/validate';
-import { getJson, type RequestOptions } from './client';
-import { settleAll } from '../lib/promise';
+import type { PortArrival } from './types.ts';
+import { array, isRecord, record } from '../lib/validate.ts';
+import { getJson, type RequestOptions } from './client.ts';
+import { settleAll } from '../lib/promise.ts';
 
 /**
  * 口岸線：往深圳灣口岸的巴士。

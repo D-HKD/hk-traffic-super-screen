@@ -1,6 +1,6 @@
-import type { AppState, Slice } from '../api/types';
-import { byId, h, replace } from '../lib/dom';
-import { agoText, clockText, freshness } from '../lib/format';
+import type { AppState, Slice } from '../api/types.ts';
+import { byId, h, replace } from '../lib/dom.ts';
+import { agoText, clockText, freshness } from '../lib/format.ts';
 
 interface SourceRow {
   readonly name: string;

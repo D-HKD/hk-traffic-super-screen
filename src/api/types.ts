@@ -51,6 +51,8 @@ export interface WeatherReading {
   readonly uvDesc: string | null;
   readonly warning: string | null;
   readonly observedAt: Date | null;
+  /** 解析失敗的欄位名（例如 ['warningMessage']）；空陣列＝全部正常。 */
+  readonly issues: readonly string[];
 }
 
 /** 九巴到站（一個站，已按路線＋目的地去重）。 */
@@ -114,7 +116,7 @@ export type ConnState = 'loading' | 'live' | 'stale' | 'offline' | 'error';
 
 export type AlertFilter = 'all' | 'latest' | 'severe';
 
-import type { MapApp } from '../ui/location';
+import type { MapApp } from '../ui/location.ts';
 
 export interface UiState {
   readonly night: boolean;

@@ -1,9 +1,9 @@
-import type { AppState, Arrival, LrtRow, Slice, StationArrivals } from '../api/types';
-import { TML_STATIONS } from '../api/mtr';
-import { byId, h, on, replace, setText } from '../lib/dom';
-import { LRT_STATIONS, haversineKm } from '../core/places';
-import { agoText, etaText, freshness } from '../lib/format';
-import { lrtCarsIcon } from './rail-art';
+import type { AppState, Arrival, LrtRow, Slice, StationArrivals } from '../api/types.ts';
+import { TML_STATIONS } from '../api/mtr.ts';
+import { byId, h, on, replace, setText } from '../lib/dom.ts';
+import { LRT_STATIONS, haversineKm } from '../core/places.ts';
+import { agoText, etaText, freshness } from '../lib/format.ts';
+import { lrtCarsIcon } from './rail-art.ts';
 
 type TmlSlice = Slice<Readonly<Partial<Record<string, StationArrivals>>>>;
 

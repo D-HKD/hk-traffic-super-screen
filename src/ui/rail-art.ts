@@ -1,5 +1,5 @@
-import { h } from '../lib/dom';
-import { svgEl } from '../lib/svg';
+import { h } from '../lib/dom.ts';
+import { svgEl } from '../lib/svg.ts';
 
 /**
  * 動感圖示。動畫本身只係裝飾，所以全部 `aria-hidden`，

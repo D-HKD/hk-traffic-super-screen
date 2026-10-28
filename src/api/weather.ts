@@ -1,10 +1,10 @@
-import { isRecord, numberOrNull, optionalText, record, text } from '../lib/validate';
-import { parseHkDateTime } from '../lib/format';
-import { nearestHkoStation } from '../core/geo';
+import { attempt, isRecord, numberOrNull, optionalText, record, text } from '../lib/validate.ts';
+import { parseHkDateTime } from '../lib/format.ts';
+import { nearestHkoStation } from '../core/geo.ts';
 import { textOrJoined } from '../core/hko.ts';
-import type { RequestOptions } from './client';
-import { getJson } from './client';
-import type { WeatherReading } from './types';
+import type { RequestOptions } from './client.ts';
+import { getJson } from './client.ts';
+import type { WeatherReading } from './types.ts';
 
 const HKO_DEFAULT = '香港天文台';
 
@@ -16,7 +16,11 @@ function readings(payload: unknown, key: string): Record<string, unknown>[] {
   if (!Array.isArray(data)) return [];
   return data.filter(isRecord);
 }
-function pickByPlace(list: readonly Record<string, unknown>[], wanted: string | null): Record<string, unknown> | undefined {
+
+function pickByPlace(
+  list: readonly Record<string, unknown>[],
+  wanted: string | null,
+): Record<string, unknown> | undefined {
   if (wanted) {
     const hit = list.find((row) => text(row['place'], 'place').includes(wanted));
     if (hit) return hit;
@@ -27,39 +31,59 @@ function pickByPlace(list: readonly Record<string, unknown>[], wanted: string | 
 /**
  * 解析 HKO rhrread。
  *
- * 舊版用 `Number(iconArray)` 猜天氣圖示，仲要自己維護一套 icon code 對照；
- * 這裡改為只講有官方定義的數字（溫度、濕度、雨量、紫外線），再加原本被忽略的
- * `warningMessage`（暴雨／颱風警告）——呢個才是真正要顯示給用戶的警報。
+ * 每個欄位獨立解析：任何一個欄位型別突變（例如 warningMessage 由字串變陣列）
+ * 只會令該欄位變 null，其餘照樣顯示，並把欄位名記入 `issues` 讓 UI 如實標示。
+ * 唔會再出現「有警告嗰日連溫度都冇」呢種情況。
  */
 export function parseWeather(payload: unknown, preferredStation: string | null): WeatherReading {
-  const root = record(payload, '天氣回應');
+  const issues: string[] = [];
 
-  const temps = readings(payload, 'temperature');
-  const hums = readings(payload, 'humidity');
-  const rains = readings(payload, 'rainfall');
-  const uvs = readings(payload, 'uvindex');
+  const temps = attempt(() => readings(payload, 'temperature'), [], issues, 'temperature');
+  const hums = attempt(() => readings(payload, 'humidity'), [], issues, 'humidity');
+  const rains = attempt(() => readings(payload, 'rainfall'), [], issues, 'rainfall');
+  const uvs = attempt(() => readings(payload, 'uvindex'), [], issues, 'uvindex');
 
-  const tempRow = pickByPlace(temps, preferredStation);
+  const tempRow = attempt(() => pickByPlace(temps, preferredStation), undefined, issues, 'temperature.place');
   const tempC = tempRow ? numberOrNull(tempRow['value']) : null;
-  const station = tempRow ? text(tempRow['place'], 'place') || HKO_DEFAULT : HKO_DEFAULT;
+  const station = tempRow
+    ? attempt(() => text(tempRow['place'], 'place'), HKO_DEFAULT, issues, 'temperature.place') || HKO_DEFAULT
+    : HKO_DEFAULT;
 
   const humidity = (() => {
-    const row = hums.find((r) => text(r['place'], 'place') === HKO_DEFAULT) ?? hums[0];
+    const row = attempt(
+      () => hums.find((entry) => text(entry['place'], 'place') === HKO_DEFAULT) ?? hums[0],
+      undefined,
+      issues,
+      'humidity.place',
+    );
     return row ? numberOrNull(row['value']) : null;
   })();
 
-  const rainMaxMm = rains.reduce<number | null>((max, row) => {
-    const v = numberOrNull(row['max']);
-    if (v === null) return max;
-    return max === null || v > max ? v : max;
-  }, null);
+  const rainMaxMm = attempt(
+    () =>
+      rains.reduce<number | null>((max, row) => {
+        const value = numberOrNull(row['max']);
+        if (value === null) return max;
+        return max === null || value > max ? value : max;
+      }, null),
+    null,
+    issues,
+    'rainfall.max',
+  );
 
   const uvRow = uvs[0];
-  const uvDesc = uvRow ? text(uvRow['desc'], 'desc') || null : null;
+  const uvDesc = uvRow ? attempt(() => text(uvRow['desc'], 'desc') || null, null, issues, 'uvindex.desc') : null;
 
-  const warning = textOrJoined(root['warningMessage']);
-  const tip = textOrJoined(root['tcmessage']);
-  const observedRaw = optionalText(root['updateTime'], 'updateTime');
+  // textOrJoined 本身已經處理字串／陣列／其他型別，唔會拋錯。
+  const warning = textOrJoined(payload && isRecord(payload) ? payload['warningMessage'] : null);
+  const tip = textOrJoined(payload && isRecord(payload) ? payload['tcmessage'] : null);
+
+  const observedRaw = attempt(
+    () => (isRecord(payload) ? optionalText(payload['updateTime'], 'updateTime') : undefined),
+    undefined,
+    issues,
+    'updateTime',
+  );
 
   return {
     station,
@@ -69,6 +93,7 @@ export function parseWeather(payload: unknown, preferredStation: string | null):
     uvDesc,
     warning: warning ?? tip,
     observedAt: observedRaw ? parseHkDateTime(observedRaw) : null,
+    issues,
   };
 }
 

@@ -1,4 +1,4 @@
-import type { MessageState, Severity, TrafficItem } from '../api/types';
+import type { MessageState, Severity, TrafficItem } from '../api/types.ts';
 import { DISTRICT_KEYWORDS, REOPENED_PATTERNS, ROADS } from '../config.ts';
 
 /**

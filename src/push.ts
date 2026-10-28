@@ -1,4 +1,4 @@
-import { proxyBase } from './api/client';
+import { proxyBase } from './api/client.ts';
 
 /**
  * Web Push 訂閱管理。

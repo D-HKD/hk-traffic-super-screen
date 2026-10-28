@@ -1,5 +1,5 @@
-import { TML_STATIONS } from '../api/mtr';
-import { haversineKm, type GeoPoint } from './places';
+import { TML_STATIONS } from '../api/mtr.ts';
+import { haversineKm, type GeoPoint } from './places.ts';
 
 export type { GeoPoint };
 export { haversineKm };

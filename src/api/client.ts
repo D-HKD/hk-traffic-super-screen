@@ -1,4 +1,4 @@
-import { ShapeError } from '../lib/validate';
+import { ShapeError } from '../lib/validate.ts';
 
 /**
  * HTTP 層：一個地方處理逾時、abort、HTTP 錯誤碼同 JSON 解析。
@@ -10,7 +10,7 @@ import { ShapeError } from '../lib/validate';
  * 令呢個檔案可以在 node 測試環境被 import 而不會爆。
  */
 
-import { APP } from '../config';
+import { APP } from '../config.ts';
 
 const FALLBACK_PROXY = APP.proxyBase;
 

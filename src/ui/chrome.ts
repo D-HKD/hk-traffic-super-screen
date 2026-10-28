@@ -1,6 +1,6 @@
-import { byId, h, on, replace, setText } from '../lib/dom';
-import { clockText, dateText } from '../lib/format';
-import type { ConnState } from '../api/types';
+import { byId, h, on, replace, setText } from '../lib/dom.ts';
+import { clockText, dateText } from '../lib/format.ts';
+import type { ConnState } from '../api/types.ts';
 
 export type ModalBlock =
   | { readonly kind: 'row'; readonly label: string; readonly value: string }

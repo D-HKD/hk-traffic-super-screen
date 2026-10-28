@@ -1,12 +1,12 @@
-import type { AppState } from '../api/types';
-import { renderAdvice } from './advice';
-import { renderBus, renderPort } from './bus';
-import { renderFavorites, type FavoritesHandlers } from './misc';
-import { renderLocation } from './location';
-import { renderMessages, renderRelevant, renderRoads } from './roads';
-import { renderRail, type RailHandlers } from './rail';
-import { renderSources } from './sources';
-import { renderWeather } from './weather';
+import type { AppState } from '../api/types.ts';
+import { renderAdvice } from './advice.ts';
+import { renderBus, renderPort } from './bus.ts';
+import { renderFavorites, type FavoritesHandlers } from './misc.ts';
+import { renderLocation } from './location.ts';
+import { renderMessages, renderRelevant, renderRoads } from './roads.ts';
+import { renderRail, type RailHandlers } from './rail.ts';
+import { renderSources } from './sources.ts';
+import { renderWeather } from './weather.ts';
 
 export interface AppHandlers {
   readonly favorites: FavoritesHandlers;

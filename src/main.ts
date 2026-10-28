@@ -1,31 +1,31 @@
 import './styles/base.css';
 import './styles/extra.css';
 
-import { errorMessage } from './api/client';
-import { fetchBusArrivals, loadBusStops, type BusStopRef } from './api/bus';
-import { fetchPortArrivals } from './api/port';
-import { fetchLrtStations } from './api/lrt';
-import { PartialFailureError, TML_CODES, fetchTmlBatch } from './api/mtr';
-import { fetchTrafficNews } from './api/traffic';
-import { idleSlice, type AlertFilter, type AppState, type ConnState, type GpsState, type Slice, type TrafficItem } from './api/types';
-import { fetchRoadSpeeds } from './api/roads';
-import { fetchWeather } from './api/weather';
-import { SEVERITY_LABEL, roadStatuses, sortByNewest } from './core/messages';
-import { nearestLrtStation, LRT_STATIONS, stationName, busStopsFor } from './core/places';
-import { REFRESH_MS } from './config';
-import { currentPushState, subscribePush, unsubscribePush } from './push';
-import { Scheduler } from './core/scheduler';
-import { createStore } from './core/store';
-import { byId, on, setText } from './lib/dom';
-import { clockText } from './lib/format';
-import { showAdviceDetail } from './ui/advice';
-import { renderApp } from './ui/app';
-import { initChrome, type Chrome, type ModalBlock } from './ui/chrome';
-import { MAP_APP_LABEL, mapsUrl, type MapApp } from './ui/location';
-import { initLrtPicker } from './ui/rail';
-import { initBusPicker } from './ui/bus';
-import { busIcon, railStrip, trainIcon, tramIcon } from './ui/rail-art';
-import { registerServiceWorker } from './pwa';
+import { errorMessage } from './api/client.ts';
+import { fetchBusArrivals, loadBusStops, type BusStopRef } from './api/bus.ts';
+import { fetchPortArrivals } from './api/port.ts';
+import { fetchLrtStations } from './api/lrt.ts';
+import { PartialFailureError, TML_CODES, fetchTmlBatch } from './api/mtr.ts';
+import { fetchTrafficNews } from './api/traffic.ts';
+import { idleSlice, type AlertFilter, type AppState, type ConnState, type GpsState, type Slice, type TrafficItem } from './api/types.ts';
+import { fetchRoadSpeeds } from './api/roads.ts';
+import { fetchWeather } from './api/weather.ts';
+import { SEVERITY_LABEL, roadStatuses, sortByNewest } from './core/messages.ts';
+import { nearestLrtStation, LRT_STATIONS, stationName, busStopsFor } from './core/places.ts';
+import { REFRESH_MS } from './config.ts';
+import { currentPushState, subscribePush, unsubscribePush } from './push.ts';
+import { Scheduler } from './core/scheduler.ts';
+import { createStore } from './core/store.ts';
+import { byId, on, setText } from './lib/dom.ts';
+import { clockText } from './lib/format.ts';
+import { showAdviceDetail } from './ui/advice.ts';
+import { renderApp } from './ui/app.ts';
+import { initChrome, type Chrome, type ModalBlock } from './ui/chrome.ts';
+import { MAP_APP_LABEL, mapsUrl, type MapApp } from './ui/location.ts';
+import { initLrtPicker } from './ui/rail.ts';
+import { initBusPicker } from './ui/bus.ts';
+import { busIcon, railStrip, trainIcon, tramIcon } from './ui/rail-art.ts';
+import { registerServiceWorker } from './pwa.ts';
 
 /* ---------------------------------------------------------------- 偏好設定 */
 

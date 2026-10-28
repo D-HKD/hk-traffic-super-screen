@@ -1,8 +1,8 @@
-import type { AlertFilter, RoadSnapshot, Severity, Slice, TrafficItem } from '../api/types';
-import { SEVERITY_LABEL, STATE_LABEL, isRelevantToDistrict, roadStatuses, sortByNewest } from '../core/messages';
-import { ROAD_LIMITS, SPEED_BAND_LABEL, congestionBand, ratioPercent, slowestDirection, speedRatio } from '../core/speed';
-import { byId, h, replace, setText } from '../lib/dom';
-import { agoText, clockText } from '../lib/format';
+import type { AlertFilter, RoadSnapshot, Severity, Slice, TrafficItem } from '../api/types.ts';
+import { SEVERITY_LABEL, STATE_LABEL, isRelevantToDistrict, roadStatuses, sortByNewest } from '../core/messages.ts';
+import { ROAD_LIMITS, SPEED_BAND_LABEL, congestionBand, ratioPercent, slowestDirection, speedRatio } from '../core/speed.ts';
+import { byId, h, replace, setText } from '../lib/dom.ts';
+import { agoText, clockText } from '../lib/format.ts';
 
 const MAX_LISTED = 6;
 const DETAIL_LIMIT = 180;

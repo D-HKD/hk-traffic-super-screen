@@ -1,7 +1,7 @@
-import { classifySeverity, classifyState, sortByNewest } from '../core/messages';
-import { parseHkDateTime } from '../lib/format';
-import type { TrafficItem } from './types';
-import { getXml, type RequestOptions } from './client';
+import { classifySeverity, classifyState, sortByNewest } from '../core/messages.ts';
+import { parseHkDateTime } from '../lib/format.ts';
+import type { TrafficItem } from './types.ts';
+import { getXml, type RequestOptions } from './client.ts';
 
 export interface TrafficFields {
   readonly id: string;

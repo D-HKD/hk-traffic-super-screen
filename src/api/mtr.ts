@@ -1,10 +1,10 @@
-import { isRecord, minutesFrom, optionalText, record, text } from '../lib/validate';
-import { parseHkDateTime } from '../lib/format';
-import { getJson, type RequestOptions } from './client';
-import type { Arrival, Direction, StationArrivals } from './types';
+import { isRecord, minutesFrom, optionalText, record, text } from '../lib/validate.ts';
+import { parseHkDateTime } from '../lib/format.ts';
+import { getJson, type RequestOptions } from './client.ts';
+import type { Arrival, Direction, StationArrivals } from './types.ts';
 
-import { TML_STATIONS } from '../config';
-import { settleAll } from '../lib/promise';
+import { TML_STATIONS } from '../config.ts';
+import { settleAll } from '../lib/promise.ts';
 
 export { TML_STATIONS };
 
