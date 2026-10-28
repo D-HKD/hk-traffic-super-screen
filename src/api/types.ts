@@ -114,6 +114,8 @@ export type ConnState = 'loading' | 'live' | 'stale' | 'offline' | 'error';
 
 export type AlertFilter = 'all' | 'latest' | 'severe';
 
+import type { MapApp } from '../ui/location';
+
 export interface UiState {
   readonly night: boolean;
   readonly filter: AlertFilter;
@@ -122,6 +124,8 @@ export interface UiState {
   readonly lrtStation: string;
   /** 巴士面板：'auto' = 跟隨輕鐵站；否則係九巴站號。 */
   readonly busStop: string;
+  /** 「在地圖開啟」用邊個 App。 */
+  readonly mapApp: MapApp;
 }
 
 export interface PortArrival {

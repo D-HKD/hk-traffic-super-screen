@@ -74,9 +74,13 @@
       <div><b>天氣觀測站</b><strong id="loc-weather">--</strong></div>
     </div>
     <p class="source-note" id="loc-note">距離為直線距離，並非步行或行車路線。</p>
+    <div class="map-choice" role="group" aria-label="選擇地圖應用">
+      <button class="map-opt is-on" type="button" data-map="google" aria-pressed="true">Google 地圖</button>
+      <button class="map-opt" type="button" data-map="amap" aria-pressed="false">高德地圖</button>
+    </div>
     <div class="loc-actions">
       <button class="wide-btn loc-gps-btn" id="gps-panel-btn" type="button">⌖ 用我位置</button>
-      <button class="wide-btn" id="map-open-btn" type="button">在地圖 App 開啟 →</button>
+      <button class="wide-btn" id="map-open-btn" type="button">在 Google 地圖開啟 →</button>
     </div>
   </article>
 </section>

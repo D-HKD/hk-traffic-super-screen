@@ -349,3 +349,16 @@
   background:linear-gradient(145deg,rgba(16,78,110,.95),rgba(8,32,50,.95));
   color:var(--text);font-weight:600;min-height:44px;
 }
+
+/* 地圖選擇（Google／高德） */
+.map-choice{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0 6px}
+.map-opt{
+  border:1px solid rgba(50,220,255,.28);background:rgba(8,30,46,.7);color:var(--muted);
+  border-radius:10px;padding:8px 6px;font-size:11px;cursor:pointer;min-height:38px;
+}
+.map-opt.is-on{
+  color:var(--text);border-color:var(--cyan);font-weight:600;
+  background:linear-gradient(145deg,rgba(14,61,90,.95),rgba(6,24,40,.95));
+  box-shadow:0 0 16px rgba(50,220,255,.18);
+}
+.map-opt:active{transform:scale(.98)}

@@ -44,10 +44,28 @@ export function renderLocation(gps: GpsState): void {
   byId('loc-note').textContent = `距離為直線距離（${distanceText(station.km)}），並非步行或行車路線；天氣用最近觀測站 ${hko.name}。`;
 }
 
-export function mapsUrl(gps: GpsState): string {
-  if (gps.lat !== null && gps.lon !== null) {
-    return `https://www.google.com/maps/search/?api=1&query=${gps.lat.toFixed(5)},${gps.lon.toFixed(5)}`;
+export type MapApp = 'google' | 'amap';
+
+export const MAP_APP_LABEL: Readonly<Record<MapApp, string>> = {
+  google: 'Google 地圖',
+  amap: '高德地圖',
+};
+
+/**
+ * 開地圖。
+ *
+ * 高德用 uri.amap.com 的通用連結：已安裝 App 會直接開 App，未安裝就開網頁版。
+ * coordinate=wgs84 一定要帶——GPS 係 WGS84，而高德預設當 GCJ-02，
+ * 唔寫嘅話支針會偏移（香港雖然多數無偏移，但帶住最安全）。
+ */
+export function mapsUrl(gps: GpsState, app: MapApp = 'google', label = ''): string {
+  const hasFix = gps.lat !== null && gps.lon !== null;
+  if (app === 'amap') {
+    if (!hasFix) return 'https://uri.amap.com/marker?position=114.1694,22.3193&name=%E9%A6%99%E6%B8%AF&coordinate=wgs84&callnative=1';
+    const name = encodeURIComponent(label || '我的位置');
+    return `https://uri.amap.com/marker?position=${gps.lon.toFixed(6)},${gps.lat.toFixed(6)}&name=${name}&coordinate=wgs84&callnative=1`;
   }
+  if (hasFix) return `https://www.google.com/maps/search/?api=1&query=${gps.lat.toFixed(5)},${gps.lon.toFixed(5)}`;
   return 'https://www.google.com/maps/search/?api=1&query=%E9%A6%99%E6%B8%AF';
 }
 

@@ -16,12 +16,12 @@ import { REFRESH_MS } from './config';
 import { currentPushState, subscribePush, unsubscribePush } from './push';
 import { Scheduler } from './core/scheduler';
 import { createStore } from './core/store';
-import { byId, on } from './lib/dom';
+import { byId, on, setText } from './lib/dom';
 import { clockText } from './lib/format';
 import { showAdviceDetail } from './ui/advice';
 import { renderApp } from './ui/app';
 import { initChrome, type Chrome, type ModalBlock } from './ui/chrome';
-import { mapsUrl } from './ui/location';
+import { MAP_APP_LABEL, mapsUrl, type MapApp } from './ui/location';
 import { initLrtPicker } from './ui/rail';
 import { initBusPicker } from './ui/bus';
 import { busIcon, railStrip, trainIcon, tramIcon } from './ui/rail-art';
@@ -42,6 +42,7 @@ interface Prefs {
   night: boolean;
   favorites: string[];
   lrtStation: string;
+  mapApp: MapApp;
   /**
    * 上次成功定位嘅座標。
    *
@@ -76,7 +77,7 @@ function readLastFix(record: Record<string, unknown>): LastFix | null {
 }
 
 function emptyPrefs(): Prefs {
-  return { night: false, favorites: [], lrtStation: DEFAULT_LRT_STATION, lastFix: null };
+  return { night: false, favorites: [], lrtStation: DEFAULT_LRT_STATION, lastFix: null, mapApp: 'google' };
 }
 
 function loadPrefs(): Prefs {
@@ -94,6 +95,7 @@ function loadPrefs(): Prefs {
       favorites,
       lrtStation: migrateStation(typeof record['lrtStation'] === 'string' ? record['lrtStation'] : DEFAULT_LRT_STATION),
       lastFix: readLastFix(record),
+      mapApp: record['mapApp'] === 'amap' ? 'amap' : 'google',
     };
   } catch {
     return emptyPrefs();
@@ -109,7 +111,7 @@ function savePrefs(state: AppState): void {
   try {
     localStorage.setItem(
       PREF_KEY,
-      JSON.stringify({ night: state.ui.night, favorites: state.ui.favorites, lrtStation: state.ui.lrtStation, lastFix: lastFixOf(state.gps) }),
+      JSON.stringify({ night: state.ui.night, favorites: state.ui.favorites, lrtStation: state.ui.lrtStation, lastFix: lastFixOf(state.gps), mapApp: state.ui.mapApp }),
     );
   } catch {
     /* 私密模式可能不允許寫入，忽略即可 */
@@ -138,7 +140,7 @@ const store = createStore<AppState>({
         at: new Date(prefs.lastFix.at),
       }
     : { status: 'idle', lat: null, lon: null, accuracyM: null, at: null },
-  ui: { night: prefs.night, filter: 'all', favorites: prefs.favorites, lrtStation: prefs.lrtStation, busStop: 'auto' },
+  ui: { night: prefs.night, filter: 'all', favorites: prefs.favorites, lrtStation: prefs.lrtStation, busStop: 'auto', mapApp: prefs.mapApp },
 });
 
 let chrome: Chrome | null = null;
@@ -245,6 +247,24 @@ function maybeSilentRefresh(): void {
       /* 舊版 Safari 唔支援查詢 geolocation 權限，忽略即可 */
     });
 }
+/** 同步地圖選擇的按鈕狀態與「開啟」按鈕文字。 */
+function syncMapChoice(): void {
+  const app = store.get().ui.mapApp;
+  for (const button of Array.from(document.querySelectorAll<HTMLButtonElement>('.map-opt'))) {
+    const on = button.dataset['map'] === app;
+    button.setAttribute('aria-pressed', String(on));
+    button.classList.toggle('is-on', on);
+  }
+  setText(byId('map-open-btn'), `在 ${MAP_APP_LABEL[app]} 開啟 →`);
+}
+
+function setMapApp(app: MapApp): void {
+  const state = store.get();
+  if (state.ui.mapApp === app) return;
+  store.update({ ui: { ...state.ui, mapApp: app } });
+  savePrefs(store.get());
+  syncMapChoice();
+}
 function setNight(value: boolean): void {
   const state = store.get();
   store.update({ ui: { ...state.ui, night: value } });
@@ -348,7 +368,9 @@ function truncate(text: string, limit: number): string {
 }
 
 function openMap(): void {
-  window.open(mapsUrl(store.get().gps), '_blank', 'noopener');
+  const state = store.get();
+  const label = state.gps.lat !== null ? '我的位置' : '';
+  window.open(mapsUrl(state.gps, state.ui.mapApp, label), '_blank', 'noopener');
 }
 
 function showAllAlerts(): void {
@@ -606,6 +628,14 @@ document.addEventListener('visibilitychange', () => {
 });
 
 on(byId('gps-panel-btn'), 'click', () => requestGps());
+
+syncMapChoice();
+for (const button of Array.from(document.querySelectorAll<HTMLButtonElement>('.map-opt'))) {
+  on(button, 'click', () => {
+    const value = button.dataset['map'];
+    if (value === 'google' || value === 'amap') setMapApp(value);
+  });
+}
 
 void currentPushState().then((state) => {
   chrome?.setNotify(state === 'subscribed' ? 'on' : state === 'denied' ? 'blocked' : 'off');
