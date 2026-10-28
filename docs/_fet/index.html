@@ -1,0 +1,8 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body><p id=o>…</p>
+<script>
+var t0=Date.now();
+fetch('https://hk-traffic-super-proxy.idyl-2014061.workers.dev/weather')
+ .then(function(r){ return r.text().then(function(b){ return {s:r.status, len:b.length, head:b.slice(0,120)}; }); })
+ .then(function(x){ document.title='STATUS='+x.s+' LEN='+x.len+' MS='+(Date.now()-t0)+' HEAD='+x.head; })
+ .catch(function(e){ document.title='FETCHERR '+e.name+': '+e.message+' MS='+(Date.now()-t0); });
+</script></body></html>
